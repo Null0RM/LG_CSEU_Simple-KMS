@@ -1,0 +1,46 @@
+/* *************************************************************************************************** */
+struct {
+    - operation
+        - createKey의 경우
+            - hmac
+                - algorithm 종류
+            - cmac
+                - algorithm 종류
+            - aes128
+                - mode(CBC, CTR)
+            - aes256
+                - mode(CBC, CTR)
+        - encryption의 경우
+            - algorithm
+                - aes128
+                    - mode (cbc, ctr)
+                - aes256
+                    - mode (cbc, ctr)
+                - hmac
+            - key
+                - key           
+                - iv(if need)
+            - in
+                - message
+                - file
+            - out
+                - [path]
+                - if NO_INPUT: out.txt
+        - decryption의 경우
+            - algorithm
+                - aes128
+                    - mode (cbc, ctr)
+                - aes256
+                    - mode (cbc, ctr)
+            - key
+                - key           
+                - iv(if need)
+            - in
+                - message
+                - file
+            - out
+                - [path]
+                - if NO_INPUT: out.txt
+        - help
+}
+/* *************************************************************************************************** */

@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/program.dir/cmakeTest.c.o  -o program 
