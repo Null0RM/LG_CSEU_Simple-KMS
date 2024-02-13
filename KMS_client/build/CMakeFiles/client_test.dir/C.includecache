@@ -38,7 +38,19 @@ sys/ipc.h
 sys/msg.h
 -
 
+/home/hyo.jung/git_KMS/KMS_client/inc/openssl_utils.h
+openssl/evp.h
+-
+openssl/rand.h
+-
+
 /home/hyo.jung/git_KMS/KMS_client/src/command_proc.c
 ../inc/command_send.h
 /home/hyo.jung/git_KMS/KMS_client/inc/command_send.h
+
+/home/hyo.jung/git_KMS/KMS_client/src/serialize.c
+../inc/command_send.h
+/home/hyo.jung/git_KMS/KMS_client/inc/command_send.h
+../inc/openssl_utils.h
+/home/hyo.jung/git_KMS/KMS_client/inc/openssl_utils.h
 

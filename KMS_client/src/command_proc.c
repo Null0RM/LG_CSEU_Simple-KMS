@@ -93,7 +93,7 @@ void    encryption_menu_2(void)
     fprintf(stdout, "2. key file\n");
 }
 
-uint8_t *input_plain_key_text(int type, int   key_size)
+uint8_t *input_plain_key_text(int type, int key_size)
 {
     fprintf(stdout, "command_proc:input_plain_key_IV_text:start\n");
 
@@ -201,10 +201,20 @@ uint8_t *input_encryption_target_text(void)
         if (ret == NULL)
         {
             ret = (uint8_t *)malloc(total_size + 1);
+            if (!ret)
+            {
+                perror("command_proc:input_encryption_target_text:malloc()");
+                exit(1);
+            }
             memcpy(ret, buffer, total_size + 1);
         }
         else {
             ret = (uint8_t *)realloc(ret, total_size + 1);
+            if (!ret)
+            {
+                perror("command_proc:input_encryption_target_text:realloc()");
+                exit(1);
+            }
             strncat(ret, buffer, size + 1);
         }
         if (buffer[size - 1] == '\n'){
@@ -221,7 +231,7 @@ int command_encryption(t_operation *oper, key_t key)
 {
     int     choose;
     int     key_size;
-    int     data_len;
+    int     data_len = 0;
 
     printf("\ncommand_proc:command_encryption() start\n");
 
@@ -241,6 +251,7 @@ int command_encryption(t_operation *oper, key_t key)
             if (choose == 2)
                 enc_dec->enc_dec_mode = MODE_CTR;
             key_size = 128;
+            data_len += (6 + sizeof(int)) * 3;
             break;
         case 3: 
             enc_dec->enc_dec_mode = MODE_CBC;
@@ -250,6 +261,7 @@ int command_encryption(t_operation *oper, key_t key)
             if (choose == 4)
                 enc_dec->enc_dec_mode = MODE_CTR;
             key_size = 256;
+            data_len += (6 + sizeof(int)) * 3;
             break;
         case 5: 
             enc_dec->enc_dec_algo = ALGO_SHA_256;
@@ -259,6 +271,7 @@ int command_encryption(t_operation *oper, key_t key)
                 enc_dec->enc_dec_algo = ALGO_SHA3_256;
             enc_dec->enc_dec_mode = MODE_NONE;
             key_size = 256;
+            data_len += (6 + sizeof(int)) * 3;
             break;
         case 7: 
             enc_dec->enc_dec_mode = MODE_CBC;
@@ -268,6 +281,7 @@ int command_encryption(t_operation *oper, key_t key)
             if (choose == 8)
                 enc_dec->enc_dec_mode = MODE_CTR;
             key_size = 128;
+            data_len += (6 + sizeof(int)) * 3;
             break;
         default:
             printf("Invalid input. please choose [help]\n");
@@ -276,8 +290,12 @@ int command_encryption(t_operation *oper, key_t key)
     
     encryption_menu_2();
     scanf("%d", &choose);
+    enc_dec->key_len = key_size / 8;
+    data_len += (6 + enc_dec->key_len);
+    data_len += (6 + 16);
     switch(choose)
     {
+
         case 1:
             enc_dec->key = input_plain_key_text(TYPE_KEY, key_size);
             if (enc_dec->enc_dec_mode == MODE_NONE)
@@ -295,6 +313,7 @@ int command_encryption(t_operation *oper, key_t key)
 
     encryption_menu_3();
     scanf("%d", &choose);
+    data_len += 6;
     switch(choose)
     {
         case 1:
@@ -307,8 +326,11 @@ int command_encryption(t_operation *oper, key_t key)
             printf("Invalid input. please choose [help]\n");
             exit(1);       
     }
+    enc_dec->data_len = strlen(enc_dec->input_data);
+    data_len += enc_dec->data_len;
     
     printf("\ncommand_proc:command_encryption() start\n");
+
     return (data_len);
 }
 
@@ -416,8 +438,12 @@ int command_proc(key_t key)
             exit(1);
     }
     payload = serialize(&oper, payload_len);
+    for(int i = 0; i < payload_len; i++)
+    {
+        printf("%02X ", payload[i]);
+    }
     mq_send(payload, payload_len, oper.operation_type, key);
-    
+
     printf("command_proc end\n");
     return COMMAND_SUCCESS;
 }

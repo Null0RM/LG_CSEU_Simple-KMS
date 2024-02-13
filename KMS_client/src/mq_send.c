@@ -31,8 +31,8 @@ int mq_send(uint8_t *payload, int payload_len, int flag, key_t key)
     send_data.data_len = payload_len;
     send_data.data_seq = 0;
     send_data.data_fin = 0;
-    
-    encrypt_payload(payload, &send_data.data_buf);
+    // data 처리하는 로직 추가
+    // encrypt_payload(payload, &send_data.data_buf);
     
     printf("mq_send end\n");
 }

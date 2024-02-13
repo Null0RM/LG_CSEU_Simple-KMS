@@ -77,22 +77,28 @@ void    serialize_enc_dec(t_operation *oper, uint8_t *ret)
     idx += 2;
     storeLE32(ret + idx, enc_dec->key_len);
     idx += 4;
-    memcpy(ret + idx, &(enc_dec->key), enc_dec->key_len);
+    memcpy(ret + idx, enc_dec->key, enc_dec->key_len);
     idx += enc_dec->key_len;
 
     storeLE16(ret + idx, TYPE_IV);
     idx += 2;
     storeLE32(ret + idx, 16);
     idx += 4;
-    memcpy(ret + idx, &(enc_dec->iv), 16);
+    memcpy(ret + idx, enc_dec->iv, 16);
     idx += 16;
 
     storeLE16(ret + idx, TYPE_INPUT_DATA);
     idx += 2;
     storeLE32(ret + idx, enc_dec->data_len);
     idx += 4;
-    memcpy(ret + idx, &(enc_dec->input_data), enc_dec->data_len);
+    memcpy(ret + idx, enc_dec->input_data, enc_dec->data_len);
     idx += enc_dec->data_len;
+
+    // clear allocated data
+    free(enc_dec->key);
+    free(enc_dec->iv);
+    free(enc_dec->input_data);
+    free(oper->operation_buf);
 
     printf("serialize:serialize_createKey() end\n");
 }

@@ -93,8 +93,8 @@ typedef struct s_enc_dec
 
 int command_proc(key_t key);
 void command_help();
-void command_decryption(t_operation *oper, key_t key);
-void command_encryption(t_operation *oper, key_t key);
+int command_decryption(t_operation *oper, key_t key);
+int command_encryption(t_operation *oper, key_t key);
 int command_create_key(t_operation *oper, key_t key);
 
 int mq_send_decrypt(t_operation *oper, key_t key);
