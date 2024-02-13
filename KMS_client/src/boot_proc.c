@@ -26,7 +26,8 @@ void    write_response(char *key)
     // printf("write_response() end\n");
 }
 
-uint8_t *decrypt_session_key(uint8_t *cipherText, int cipherText_len ) {
+uint8_t *decrypt_session_key(uint8_t *cipherText, int cipherText_len) 
+{
     uint8_t *plainText;
     int len = 0;
 

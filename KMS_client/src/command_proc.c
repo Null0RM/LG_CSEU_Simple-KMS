@@ -119,8 +119,7 @@ uint8_t *input_plain_key_text(int type, int key_size)
     }
     while(getchar()!='\n');
 
-    fgets(ret, ret_size / 8, stdin);
-    ret[ret_size/8] = '\0';
+    fgets(ret, ret_size / 8 + 1, stdin);
 
     fprintf(stdout, "command_proc:input_plain_key_IV_text:end\n");
     return (ret);
@@ -163,12 +162,10 @@ int input_plain_key_file(int   key_size, t_enc_dec *enc_dec)
 
     pointer = strstr(tmp, "received key");
     memcpy(enc_dec->key, pointer + strlen("received key: "), key_size / 8);
-    enc_dec->key[key_size - 1] = '\0';
 
     if ((pointer = strstr(tmp, "received IV: ")) > 0)
     {
         memcpy(enc_dec->iv, pointer + strlen("received IV: "), 16);
-        enc_dec->iv[16] = '\0';
     }
 
     close(fd);
@@ -438,10 +435,6 @@ int command_proc(key_t key)
             exit(1);
     }
     payload = serialize(&oper, payload_len);
-    for(int i = 0; i < payload_len; i++)
-    {
-        printf("%02X ", payload[i]);
-    }
     mq_send(payload, payload_len, oper.operation_type, key);
 
     printf("command_proc end\n");

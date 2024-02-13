@@ -1,39 +1,43 @@
 #include "../inc/openssl_utils.h"
 #include "../inc/common.h"
 
-int do_encrypt_payload(uint8_t *cipherText, uint8_t *plainText, int plainText_len, t_keys keys) 
+int do_encrypt_payload(uint8_t *plaintext, int plaintext_len, uint8_t *key, uint8_t *iv, uint8_t *ciphertext)
 {
-    printf("encrypt_payload:do_encrypt_payload() start\n");
+    EVP_CIPHER_CTX *ctx;
 
-    int len = 0;
+    int len;
 
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) {
-        perror("encrypt_payload:EVP_CIPHER_CTX_new()");
+    int ciphertext_len;
+
+    if(!(ctx = EVP_CIPHER_CTX_new()))
+    {
+        perror("encrypt_payload:do_encrypt_payload:EVP_CIPHER_CTX_new()");
         exit(1);
     }
 
-    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, keys.key, keys.iv)) {
-        perror("encrypt_payload:EVP_EncryptInit_ex()");
+    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    {
+        perror("encrypt_payload:do_encrypt_payload:EVP_EncryptInit_ex()");
         exit(1);
     }
-
-    if (1 != EVP_EncryptUpdate(ctx, cipherText, &len, plainText, plainText_len)) {
-        perror("encrypt_payload:EVP_EncryptUpdate()");
+        
+    if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+    {
+        perror("encrypt_payload:do_encrypt_payload:EVP_EncryptUpdate()");
         exit(1);
     }
+    ciphertext_len = len;
 
-    int final_len = 0;
-    if (1 != EVP_EncryptFinal_ex(ctx, cipherText + len, &final_len)) {
-        perror("encrypt_payload:EVP_EncryptFinal_ex()");
-        exit(-1);
+    if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
+    {
+        perror("encrypt_payload:do_encrypt_payload:EVP_EncryptFinal_ex()");
+        exit(1);
     }
-    len += final_len;
+    ciphertext_len += len;
+
     EVP_CIPHER_CTX_free(ctx);
 
-    printf("encrypt_payload:do_encrypt_payload() end\n");
-
-    return len;
+    return ciphertext_len;
 }
 
 t_keys get_session_key(void)
@@ -64,16 +68,16 @@ t_keys get_session_key(void)
     return (ret_key);
 }
 
-int encrypt_payload(uint8_t * cipherText, uint8_t * buffer, int buffer_len)
+int encrypt_payload(uint8_t *buffer, int buffer_len, uint8_t *data)
 {
     printf("encrypt_payload: start\n"); 
     
     int ret;
     t_keys session_key = get_session_key();
-    
-    ret = do_encrypt_payload(cipherText, buffer, buffer_len, session_key);
+
+    ret = do_encrypt_payload(buffer, buffer_len, session_key.key, session_key.iv, data);
 
     printf("encrypt_payload: end\n");
-    
+
     return ret;
 }

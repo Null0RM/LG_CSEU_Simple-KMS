@@ -6,12 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/hyo.jung/git_KMS/KMS_client/inc/command_send.h
-common.h
-/home/hyo.jung/git_KMS/KMS_client/inc/common.h
-mq.h
-/home/hyo.jung/git_KMS/KMS_client/inc/mq.h
-
 /home/hyo.jung/git_KMS/KMS_client/inc/common.h
 stdio.h
 -
@@ -28,29 +22,15 @@ stdint.h
 time.h
 -
 
-/home/hyo.jung/git_KMS/KMS_client/inc/mq.h
-../inc/common.h
-/home/hyo.jung/git_KMS/KMS_client/inc/common.h
-sys/types.h
--
-sys/ipc.h
--
-sys/msg.h
--
-
 /home/hyo.jung/git_KMS/KMS_client/inc/openssl_utils.h
 openssl/evp.h
 -
 openssl/rand.h
 -
 
-/home/hyo.jung/git_KMS/KMS_client/src/command_proc.c
-../inc/command_send.h
-/home/hyo.jung/git_KMS/KMS_client/inc/command_send.h
-
-/home/hyo.jung/git_KMS/KMS_client/src/serialize.c
-../inc/command_send.h
-/home/hyo.jung/git_KMS/KMS_client/inc/command_send.h
+/home/hyo.jung/git_KMS/KMS_client/src/encrypt_payload.c
 ../inc/openssl_utils.h
 /home/hyo.jung/git_KMS/KMS_client/inc/openssl_utils.h
+../inc/common.h
+/home/hyo.jung/git_KMS/KMS_client/inc/common.h
 

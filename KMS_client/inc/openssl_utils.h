@@ -18,9 +18,9 @@ typedef struct s_keys
 
 /* ___FUNCTIONS_START___ */
 
-int encrypt_payload(uint8_t * cipherText, uint8_t *buffer, int buffer_len);
+int encrypt_payload(uint8_t *buffer, int buffer_len, uint8_t *data);
 t_keys get_session_key(void);
-int do_encrypt_payload(uint8_t *cipherText, uint8_t *plainText, int plainText_len, t_keys keys);
+int do_encrypt_payload(uint8_t *plaintext, int plaintext_len, uint8_t *key, uint8_t *iv, uint8_t *ciphertext);
 /* ___FUNCTIONS_END___ */
 
 #endif
