@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hyo.jung/real_KMS/KMS_client
+CMAKE_SOURCE_DIR = /home/hyo.jung/git_KMS/KMS_client
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hyo.jung/real_KMS/KMS_client/build
+CMAKE_BINARY_DIR = /home/hyo.jung/git_KMS/KMS_client/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/client_test.dir/depend.make
@@ -59,107 +59,107 @@ include CMakeFiles/client_test.dir/flags.make
 
 CMakeFiles/client_test.dir/src/boot_proc.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/boot_proc.c.o: ../src/boot_proc.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/client_test.dir/src/boot_proc.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/boot_proc.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/boot_proc.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/client_test.dir/src/boot_proc.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/boot_proc.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/boot_proc.c
 
 CMakeFiles/client_test.dir/src/boot_proc.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/boot_proc.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/boot_proc.c > CMakeFiles/client_test.dir/src/boot_proc.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/boot_proc.c > CMakeFiles/client_test.dir/src/boot_proc.c.i
 
 CMakeFiles/client_test.dir/src/boot_proc.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/boot_proc.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/boot_proc.c -o CMakeFiles/client_test.dir/src/boot_proc.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/boot_proc.c -o CMakeFiles/client_test.dir/src/boot_proc.c.s
 
 CMakeFiles/client_test.dir/src/command_proc.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/command_proc.c.o: ../src/command_proc.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/client_test.dir/src/command_proc.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/command_proc.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/command_proc.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/client_test.dir/src/command_proc.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/command_proc.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/command_proc.c
 
 CMakeFiles/client_test.dir/src/command_proc.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/command_proc.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/command_proc.c > CMakeFiles/client_test.dir/src/command_proc.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/command_proc.c > CMakeFiles/client_test.dir/src/command_proc.c.i
 
 CMakeFiles/client_test.dir/src/command_proc.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/command_proc.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/command_proc.c -o CMakeFiles/client_test.dir/src/command_proc.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/command_proc.c -o CMakeFiles/client_test.dir/src/command_proc.c.s
 
 CMakeFiles/client_test.dir/src/deserialize.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/deserialize.c.o: ../src/deserialize.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/client_test.dir/src/deserialize.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/deserialize.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/deserialize.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/client_test.dir/src/deserialize.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/deserialize.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/deserialize.c
 
 CMakeFiles/client_test.dir/src/deserialize.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/deserialize.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/deserialize.c > CMakeFiles/client_test.dir/src/deserialize.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/deserialize.c > CMakeFiles/client_test.dir/src/deserialize.c.i
 
 CMakeFiles/client_test.dir/src/deserialize.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/deserialize.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/deserialize.c -o CMakeFiles/client_test.dir/src/deserialize.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/deserialize.c -o CMakeFiles/client_test.dir/src/deserialize.c.s
 
 CMakeFiles/client_test.dir/src/encrypt_payload.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/encrypt_payload.c.o: ../src/encrypt_payload.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/client_test.dir/src/encrypt_payload.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/encrypt_payload.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/encrypt_payload.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/client_test.dir/src/encrypt_payload.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/encrypt_payload.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/encrypt_payload.c
 
 CMakeFiles/client_test.dir/src/encrypt_payload.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/encrypt_payload.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/encrypt_payload.c > CMakeFiles/client_test.dir/src/encrypt_payload.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/encrypt_payload.c > CMakeFiles/client_test.dir/src/encrypt_payload.c.i
 
 CMakeFiles/client_test.dir/src/encrypt_payload.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/encrypt_payload.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/encrypt_payload.c -o CMakeFiles/client_test.dir/src/encrypt_payload.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/encrypt_payload.c -o CMakeFiles/client_test.dir/src/encrypt_payload.c.s
 
 CMakeFiles/client_test.dir/src/main.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/main.c.o: ../src/main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/client_test.dir/src/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/main.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/client_test.dir/src/main.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/main.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/main.c
 
 CMakeFiles/client_test.dir/src/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/main.c > CMakeFiles/client_test.dir/src/main.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/main.c > CMakeFiles/client_test.dir/src/main.c.i
 
 CMakeFiles/client_test.dir/src/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/main.c -o CMakeFiles/client_test.dir/src/main.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/main.c -o CMakeFiles/client_test.dir/src/main.c.s
 
 CMakeFiles/client_test.dir/src/mq_recv.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/mq_recv.c.o: ../src/mq_recv.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/client_test.dir/src/mq_recv.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/mq_recv.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/mq_recv.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/client_test.dir/src/mq_recv.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/mq_recv.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/mq_recv.c
 
 CMakeFiles/client_test.dir/src/mq_recv.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/mq_recv.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/mq_recv.c > CMakeFiles/client_test.dir/src/mq_recv.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/mq_recv.c > CMakeFiles/client_test.dir/src/mq_recv.c.i
 
 CMakeFiles/client_test.dir/src/mq_recv.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/mq_recv.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/mq_recv.c -o CMakeFiles/client_test.dir/src/mq_recv.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/mq_recv.c -o CMakeFiles/client_test.dir/src/mq_recv.c.s
 
 CMakeFiles/client_test.dir/src/mq_send.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/mq_send.c.o: ../src/mq_send.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/client_test.dir/src/mq_send.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/mq_send.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/mq_send.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/client_test.dir/src/mq_send.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/mq_send.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/mq_send.c
 
 CMakeFiles/client_test.dir/src/mq_send.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/mq_send.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/mq_send.c > CMakeFiles/client_test.dir/src/mq_send.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/mq_send.c > CMakeFiles/client_test.dir/src/mq_send.c.i
 
 CMakeFiles/client_test.dir/src/mq_send.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/mq_send.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/mq_send.c -o CMakeFiles/client_test.dir/src/mq_send.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/mq_send.c -o CMakeFiles/client_test.dir/src/mq_send.c.s
 
 CMakeFiles/client_test.dir/src/serialize.c.o: CMakeFiles/client_test.dir/flags.make
 CMakeFiles/client_test.dir/src/serialize.c.o: ../src/serialize.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/client_test.dir/src/serialize.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/serialize.c.o   -c /home/hyo.jung/real_KMS/KMS_client/src/serialize.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/client_test.dir/src/serialize.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/client_test.dir/src/serialize.c.o   -c /home/hyo.jung/git_KMS/KMS_client/src/serialize.c
 
 CMakeFiles/client_test.dir/src/serialize.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/client_test.dir/src/serialize.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/real_KMS/KMS_client/src/serialize.c > CMakeFiles/client_test.dir/src/serialize.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/hyo.jung/git_KMS/KMS_client/src/serialize.c > CMakeFiles/client_test.dir/src/serialize.c.i
 
 CMakeFiles/client_test.dir/src/serialize.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/client_test.dir/src/serialize.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/real_KMS/KMS_client/src/serialize.c -o CMakeFiles/client_test.dir/src/serialize.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/hyo.jung/git_KMS/KMS_client/src/serialize.c -o CMakeFiles/client_test.dir/src/serialize.c.s
 
 # Object files for target client_test
 client_test_OBJECTS = \
@@ -185,7 +185,7 @@ client_test: CMakeFiles/client_test.dir/src/mq_send.c.o
 client_test: CMakeFiles/client_test.dir/src/serialize.c.o
 client_test: CMakeFiles/client_test.dir/build.make
 client_test: CMakeFiles/client_test.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking C executable client_test"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking C executable client_test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/client_test.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -198,6 +198,6 @@ CMakeFiles/client_test.dir/clean:
 .PHONY : CMakeFiles/client_test.dir/clean
 
 CMakeFiles/client_test.dir/depend:
-	cd /home/hyo.jung/real_KMS/KMS_client/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/hyo.jung/real_KMS/KMS_client /home/hyo.jung/real_KMS/KMS_client /home/hyo.jung/real_KMS/KMS_client/build /home/hyo.jung/real_KMS/KMS_client/build /home/hyo.jung/real_KMS/KMS_client/build/CMakeFiles/client_test.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/hyo.jung/git_KMS/KMS_client/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/hyo.jung/git_KMS/KMS_client /home/hyo.jung/git_KMS/KMS_client /home/hyo.jung/git_KMS/KMS_client/build /home/hyo.jung/git_KMS/KMS_client/build /home/hyo.jung/git_KMS/KMS_client/build/CMakeFiles/client_test.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/client_test.dir/depend
 

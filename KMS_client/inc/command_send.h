@@ -73,14 +73,14 @@ typedef struct s_createKey
 
 typedef struct s_enc_dec
 {
-    int     enc_dec_isMAC; // encdeckey, (hmac, cmac)
-    int     enc_dec_algo; // aes128, aes256, (sha-256, sha3-256);
-    int     enc_dec_mode; // NULL, CBC, CTR
+    int         enc_dec_isMAC; // encdeckey, (hmac, cmac)
+    int         enc_dec_algo; // aes128, aes256, (sha-256, sha3-256);
+    int         enc_dec_mode; // NULL, CBC, CTR
     uint8_t    *key; // algo에 따라 malloc 후 입력받아서 전송
     uint8_t    *iv; // algo에 따라 malloc 후 입력받아서 전송
-    // int     input_type; // file, text
+    int         key_len;
     uint8_t    *input_data; // if(file): path, if(text): plain
-    // uint8_t    *out_name; // output file name
+    int         data_len;
 } t_enc_dec;
 
 
@@ -95,15 +95,15 @@ int command_proc(key_t key);
 void command_help();
 void command_decryption(t_operation *oper, key_t key);
 void command_encryption(t_operation *oper, key_t key);
-void command_create_key(t_operation *oper, key_t key);
+int command_create_key(t_operation *oper, key_t key);
 
 int mq_send_decrypt(t_operation *oper, key_t key);
 int mq_send_encrypt(t_operation *oper, key_t key);
 int mq_send_createKey(t_operation *oper, key_t key);
-int mq_send(t_operation *oper, key_t key);
+int mq_send(uint8_t *payload, int payload_len, key_t key);
 
 void payload_createKey(t_operation *oper, uint8_t *buffer);
-int serialize(t_operation *oper, uint8_t *cipher);
+uint8_t *serialize(t_operation *oper, int payload_len);
 int deserialize_tlv(uint8_t   *plainText, int oper_type, int result_len);
 /* ___FUNCTION_DEFINE_END___ */
 /* *************************************************************************************************** */

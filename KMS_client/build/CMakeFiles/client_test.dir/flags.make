@@ -6,5 +6,5 @@ C_FLAGS =   -std=gnu11
 
 C_DEFINES = 
 
-C_INCLUDES = -I/home/hyo.jung/real_KMS/KMS_client/inc 
+C_INCLUDES = -I/home/hyo.jung/git_KMS/KMS_client/inc 
 

@@ -14,19 +14,20 @@ void    get_time(uint8_t * timeString)
 
 int deserialize_and_store(uint8_t * response, int fd, int response_len)
 {
-    int     response_idx = 0;
-    int     buffer_len = 0;
-    uint8_t type;
-    int     data_len;
-    int     tmp;
-    uint8_t buffer[BUFFER_SIZE] = {};
+    int         response_idx = 0;
+    int         buffer_len = 0;
+    uint8_t     type;
+    uint16_t    data_len;
+    int         tmp;
+    uint8_t     buffer[BUFFER_SIZE] = {};
 
     while (response_idx < response_len)
     {
         type = response[response_idx++];
 
         if (type == TYPE_ISMAC) {
-            data_len = response[response_idx++];
+            memcpy(&data_len, response + response_idx, sizeof(data_len));
+            response_idx += 2;
             memcpy(&tmp, response + response_idx, data_len);
             if (tmp == ISMAC_NONE)
             {
@@ -51,7 +52,8 @@ int deserialize_and_store(uint8_t * response, int fd, int response_len)
             response_idx += data_len;
         }
         else if (type == TYPE_ALGO) {
-            data_len = response[response_idx++];
+            memcpy(&data_len, response + response_idx, sizeof(data_len));
+            response_idx += 2;
             memcpy(&tmp, response + response_idx, data_len);
             if (tmp == ALGO_AES128)
             {
@@ -81,7 +83,8 @@ int deserialize_and_store(uint8_t * response, int fd, int response_len)
             response_idx += data_len;
         }
         else if (type == TYPE_MODE) {
-            data_len = response[response_idx++];
+            memcpy(&data_len, response + response_idx, sizeof(data_len));
+            response_idx += 2;
             memcpy(&tmp, response + response_idx, data_len);
             if (tmp == MODE_NONE) {}
             else if (tmp == MODE_CBC)
@@ -102,7 +105,8 @@ int deserialize_and_store(uint8_t * response, int fd, int response_len)
             response_idx += data_len;
         }
         else if (type == TYPE_KEY) {
-            data_len = response[response_idx++];
+            memcpy(&data_len, response + response_idx, sizeof(data_len));
+            response_idx += 2;
             strncat(buffer, "received key: ", 15);
             strncat(buffer, response + response_idx, data_len + 1);
             strncat(buffer, "\n", 2);
@@ -110,7 +114,8 @@ int deserialize_and_store(uint8_t * response, int fd, int response_len)
             response_idx += data_len;
         }
         else if (type == TYPE_IV) {
-            data_len = response[response_idx++];
+            memcpy(&data_len, response + response_idx, sizeof(data_len));
+            response_idx += 2;
             strncat(buffer, "received IV: ", 14);
             strncat(buffer, response + response_idx, data_len + 1);
             strncat(buffer, "\n", 2);
