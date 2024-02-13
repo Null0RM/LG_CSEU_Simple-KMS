@@ -416,7 +416,7 @@ int command_proc(key_t key)
             exit(1);
     }
     payload = serialize(&oper, payload_len);
-    mq_send(payload, payload_len, key);
+    mq_send(payload, payload_len, oper.operation_type, key);
     
     printf("command_proc end\n");
     return COMMAND_SUCCESS;

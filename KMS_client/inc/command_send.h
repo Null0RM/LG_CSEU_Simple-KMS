@@ -100,7 +100,7 @@ int command_create_key(t_operation *oper, key_t key);
 int mq_send_decrypt(t_operation *oper, key_t key);
 int mq_send_encrypt(t_operation *oper, key_t key);
 int mq_send_createKey(t_operation *oper, key_t key);
-int mq_send(uint8_t *payload, int payload_len, key_t key);
+int mq_send(uint8_t *payload, int payload_len, int flag, key_t key);
 
 void payload_createKey(t_operation *oper, uint8_t *buffer);
 uint8_t *serialize(t_operation *oper, int payload_len);

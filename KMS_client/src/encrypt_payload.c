@@ -34,7 +34,7 @@ int do_encrypt_payload(uint8_t *cipherText, uint8_t *plainText, int plainText_le
     printf("encrypt_payload:do_encrypt_payload() end\n");
 
     return len;
-}   
+}
 
 t_keys get_session_key(void)
 {
@@ -70,14 +70,10 @@ int encrypt_payload(uint8_t * cipherText, uint8_t * buffer, int buffer_len)
     
     int ret;
     t_keys session_key = get_session_key();
-    for(int i = 0; i < 16; i++)
-        printf("0x%02x ", session_key.key[i]);
-    printf("\n");
-    for(int i = 0; i < 16; i++)
-        printf("0x%02x ", session_key.iv[i]);
-    printf("\n");
+    
     ret = do_encrypt_payload(cipherText, buffer, buffer_len, session_key);
 
     printf("encrypt_payload: end\n");
+    
     return ret;
 }

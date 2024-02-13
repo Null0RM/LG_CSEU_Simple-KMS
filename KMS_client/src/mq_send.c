@@ -22,10 +22,17 @@ int mq_send_decrypt(t_operation *oper, key_t key)
     return (COMMAND_SUCCESS);
 }
 
-int mq_send(uint8_t *payload, int payload_len, key_t key)
+int mq_send(uint8_t *payload, int payload_len, int flag, key_t key)
 {
     printf("mq_send start\n");
-
-    encrypt_payload(payload);
+    t_data send_data;
+    
+    send_data.data_type = flag;
+    send_data.data_len = payload_len;
+    send_data.data_seq = 0;
+    send_data.data_fin = 0;
+    
+    encrypt_payload(payload, &send_data.data_buf);
+    
     printf("mq_send end\n");
 }
