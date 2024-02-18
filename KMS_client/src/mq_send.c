@@ -13,7 +13,7 @@ int mq_send_data(t_data *data, key_t key)
         perror("mq_send:mq_send_data:msgget()");
         exit(1);
     }
-    if (-1 == msgsnd(msqid, data, sizeof(data) - sizeof(long), 0))
+    if (-1 == msgsnd(msqid, data, sizeof(t_data) - sizeof(long), 0))
     {
         perror("mq_send:mq_send_data:msgsnd()");
         exit(1);
@@ -34,7 +34,7 @@ int mq_send(uint8_t *payload, int payload_len, int flag, key_t key)
     send_data.data_fin = 0;
     while (payload_len > 0)
     {
-        if (BUFFER_SIZE >= payload_len)
+        if (BUFFER_SIZE > payload_len)
         {
             cpy_len = payload_len;
             send_data.data_fin = 1;

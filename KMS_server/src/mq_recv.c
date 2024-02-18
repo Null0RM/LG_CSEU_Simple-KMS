@@ -70,16 +70,21 @@ t_keys get_session_key()
 
 uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type)
 {
+    /*
+    key: mq session key ID
+    recv_len: received data length
+    oper_type: operation type
+    */
     fprintf(stdout, "mq_recv:mq_recv_payload() start\n");
 
     int msqid;
     t_data recv_data;
-    uint8_t *cipherText = NULL;
-    uint8_t *newCipherText = NULL;
+    uint8_t *payload = NULL;
+    uint8_t *newPayload = NULL;
     int prev_size = 0;
 
-    cipherText = (uint8_t *)malloc(1);
-    if (!cipherText)
+    payload = (uint8_t *)malloc(1);
+    if (!payload)
     {
         perror("mq_recv:malloc()");
         exit(1);
@@ -91,22 +96,35 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type)
     }
     while (1)
     {
-        if (-1 == (msgrcv(msqid, &recv_data, sizeof(recv_data) - sizeof(long), 0, 0)))
+        if (-1 == (msgrcv(msqid, &recv_data, sizeof(t_data) - sizeof(long), 0, 0)))
         {
             perror("mq_recv:msgrcv()");
             exit(1);
         }
         printf("recvdata.data_len: %d\n", recv_data.data_len);
         *oper_type = recv_data.data_type;
-        newCipherText = (uint8_t *)realloc(cipherText, prev_size + recv_data.data_len);
-        if (!newCipherText)
+
+        // 정해진 size만큼 payload를 저장할 공간을 할당하는 코드
+        if (payload == NULL)
         {
-            perror("mq_recv:mq_recv_payload:realloc()");
-            exit(1);
+            payload = (uint8_t *)malloc(recv_data.data_len);
+            if (!payload)
+            {
+                perror("mq_recv:mq_recv_payload:malloc()");
+                exit(1);
+            }
         }
-        fprintf(stdout, "realloc success\n");
-        cipherText = newCipherText;
-        memcpy(&cipherText[prev_size], recv_data.data_buf, recv_data.data_len);
+        else
+        {
+            newPayload = (uint8_t *)realloc(payload, prev_size + recv_data.data_len);
+            if (!newPayload)
+            {
+                perror("mq_recv:mq_recv_payload:realloc()");
+                exit(1);
+            }
+            payload = newPayload; // 이렇게 해야 heap 영역 공간 부족 이슈를 해결할 수 있다.
+        }
+        memcpy(payload + prev_size, recv_data.data_buf, recv_data.data_len);
         prev_size += recv_data.data_len;
 
         if (recv_data.data_fin == 1)
@@ -120,9 +138,9 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type)
         perror("mq_recv:msgctl()");
         exit(1);
     }
-    fprintf(stdout, "mq_recv:mq_recv_payload() end\n");
 
-    return (cipherText);
+    fprintf(stdout, "mq_recv:mq_recv_payload() end\n");
+    return (payload);
 }
 
 void *mq_recv(key_t key, int *flag)
@@ -133,13 +151,13 @@ void *mq_recv(key_t key, int *flag)
     int oper_len = 0;
     int oper_type = 0;
     t_keys session_key;
-    uint8_t *cipherText;
+    uint8_t *payload;
     uint8_t *operation;
     void *struct_oper;
 
     session_key = get_session_key();
-    cipherText = mq_recv_payload(key, &recv_len, flag);
-    if (!cipherText)
+    payload = mq_recv_payload(key, &recv_len, flag);
+    if (!payload)
     {
         perror("mq_recv:mq_recv_payload()");
         exit(1);
@@ -152,8 +170,9 @@ void *mq_recv(key_t key, int *flag)
         exit(1);
     }
     operation[recv_len] = '\0';
-    oper_len = dec_payload(operation, cipherText, recv_len, session_key);
-    free(cipherText);
+    oper_len = dec_payload(operation, payload, recv_len, session_key);
+
+    free(payload);
 
     struct_oper = deserialize_tlv(operation, oper_len, *flag);
     free(operation);
