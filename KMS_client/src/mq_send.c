@@ -19,7 +19,7 @@ int mq_send_data(t_data *data, key_t key)
         exit(1);
     }
 
-    return EXIT_SUCCESS;
+    return (1);
 }
 
 int mq_send(uint8_t *payload, int payload_len, int flag, key_t key)
@@ -46,9 +46,11 @@ int mq_send(uint8_t *payload, int payload_len, int flag, key_t key)
             fprintf(stderr, "mq_send:mq_send_data:failed\n");
             exit(1);
         }
+        fprintf(stdout, "paylad_length: %d\n", payload_len);
         payload_len -= BUFFER_SIZE;
         send_data.data_seq++;
     }
 
+    return 1;
     printf("mq_send end\n");
 }

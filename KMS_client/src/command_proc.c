@@ -236,7 +236,7 @@ int command_encryption(t_operation *oper, key_t key)
     int key_size;
     int data_len = 0;
 
-    printf("\ncommand_proc:comma nd_encryption() start\n");
+    printf("\ncommand_proc:command_encryption() start\n");
 
     oper->operation_type = OPERATION_ENCRYPT;
     oper->operation_buf = (t_enc_dec *)malloc(sizeof(t_enc_dec));
@@ -351,6 +351,7 @@ int command_create_key(t_operation *oper, key_t key)
     printf("command_proc:command_create_key() start\n");
 
     int choose;
+    int data_len = 0;
     oper->operation_buf = (t_createKey *)malloc(sizeof(t_createKey));
     t_createKey *createKey = oper->operation_buf;
     oper->operation_type = OPERATION_CREATEKEY;
@@ -366,6 +367,7 @@ int command_create_key(t_operation *oper, key_t key)
         createKey->createKey_algo = ALGO_AES128;
         if (choose == 2)
             createKey->createKey_mode = MODE_CTR;
+        data_len += (6 + sizeof(int)) * 3;
         break;
     case 3:
         createKey->createKey_mode = MODE_CBC;
@@ -374,6 +376,7 @@ int command_create_key(t_operation *oper, key_t key)
         createKey->createKey_algo = ALGO_AES256;
         if (choose == 4)
             createKey->createKey_mode = MODE_CTR;
+        data_len += (6 + sizeof(int)) * 3;
         break;
     case 5:
         createKey->createKey_algo = ALGO_SHA_256;
@@ -382,6 +385,7 @@ int command_create_key(t_operation *oper, key_t key)
         if (choose == 6)
             createKey->createKey_algo = ALGO_SHA3_256;
         createKey->createKey_mode = MODE_NONE;
+        data_len += (6 + sizeof(int)) * 3;
         break;
     case 7:
         createKey->createKey_mode = MODE_CBC;
@@ -390,13 +394,15 @@ int command_create_key(t_operation *oper, key_t key)
         createKey->createKey_algo = ALGO_AES128;
         if (choose == 8)
             createKey->createKey_mode = MODE_CTR;
+        data_len += (6 + sizeof(int)) * 3;
         break;
     default:
         printf("Invalid input. please choose [help]\n");
         exit(1);
     }
+    oper->operation_len = data_len;
 
-    return (oper->operation_len);
+    return (data_len);
 }
 
 void choose_operation_menu(void)

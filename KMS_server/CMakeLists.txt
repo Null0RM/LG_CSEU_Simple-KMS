@@ -12,7 +12,8 @@ set(SOURCE_FILES
         src/main.c
         src/mq_recv.c
         src/mq_send.c
-        src/crypto_operation.c)
+        src/crypto_operation.c
+        src/serialize.c)
 
 add_executable(server_test ${SOURCE_FILES})
 

@@ -8,8 +8,8 @@
 
 typedef struct s_keys
 {
-    uint8_t key[16];
-    uint8_t iv[16];
+    uint8_t key[17];
+    uint8_t iv[17];
 } t_keys;
 
 #ifndef BUFFER_SIZE
@@ -17,10 +17,10 @@ typedef struct s_keys
 #endif
 
 /* ___FUNCTIONS_START___ */
-
-int encrypt_payload(uint8_t *buffer, int buffer_len, uint8_t *data);
+int encrypt_operation(const EVP_CIPHER * algo_mode, uint8_t *plainText, uint8_t *cipherText, int plainText_len, uint8_t *key, uint8_t *iv);
+int decrypt_operation(const EVP_CIPHER * algo_mode, uint8_t *plaintext, uint8_t *ciphertext, int ciphertext_len, uint8_t *key, uint8_t *iv);
+int encrypt_payload(uint8_t *buffer, int buffer_len, uint8_t *to_send_data);
 t_keys get_session_key(void);
-int do_encrypt_payload(uint8_t *plaintext, int plaintext_len, uint8_t *key, uint8_t *iv, uint8_t *ciphertext);
 /* ___FUNCTIONS_END___ */
 
 #endif

@@ -13,9 +13,7 @@ int main()
         perror("verify failed");
         exit(0);
     }
-    usleep(300000);
     printf("session key derivation success\n");
-    usleep(400000);
     // command process
     command_proc(key_send_command);
     mq_recv(key_recv_result);

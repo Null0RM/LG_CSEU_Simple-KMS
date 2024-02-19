@@ -6,26 +6,46 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
     fprintf(stdout, "do_op:do_op_createKey() start\n");
     int     idx = 0;
     RAND_status();
+    fprintf(stdout, "RAND_status() success\n");
 
-    buffer[idx++] = TYPE_ISMAC;
-    buffer[idx++] = sizeof(int);
+    storeLE16(buffer + idx, TYPE_ISMAC);
+    idx += 2;
+    fprintf(stdout, "set TYPE success\n");
+    storeLE32(buffer + idx, sizeof(int));
+    idx += 4;
+    fprintf(stdout, "set LEN success\n");
     memcpy(buffer + idx, &(oper->createKey_isMAC), sizeof(int));
     idx += sizeof(int);
+    fprintf(stdout, "do_op_createKey:serialize_isMAC:success\n");
 
-    buffer[idx++] = TYPE_ALGO;
-    buffer[idx++] = sizeof(int);
+    storeLE16(buffer + idx, TYPE_ALGO);
+    idx += 2;
+    fprintf(stdout, "set TYPE success\n");
+    storeLE32(buffer + idx, sizeof(int));
+    idx += 4;
+    fprintf(stdout, "set LEN success\n");
     memcpy(buffer + idx, &(oper->createKey_algo), sizeof(int));
     idx += sizeof(int);
+    fprintf(stdout, "do_op_createKey:serialize_algo:success\n");
 
-    buffer[idx++] = TYPE_MODE;
-    buffer[idx++] = sizeof(int);
+    storeLE16(buffer + idx, TYPE_MODE);
+    idx += 2;
+    fprintf(stdout, "set TYPE success\n");
+    storeLE32(buffer + idx, sizeof(int));
+    idx += 4;
+    fprintf(stdout, "set LEN success\n");
     memcpy(buffer + idx, &(oper->createKey_mode), sizeof(int));
     idx += sizeof(int);
+    fprintf(stdout, "do_op_createKey:serialize_mode:success\n");
 
-    buffer[idx++] = TYPE_KEY;
+    storeLE16(buffer + idx, TYPE_KEY);
+    idx += 2;
+    fprintf(stdout, "set TYPE success\n");
     if (oper->createKey_algo == ALGO_AES128)
     {
-        buffer[idx++] = 0x10;
+        storeLE32(buffer + idx, sizeof(int));
+        idx += 4;
+        fprintf(stdout, "set LEN success\n");
         RAND_bytes(buffer + idx, 0x10);
         idx += 0x10;
     }
@@ -33,7 +53,9 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
         oper->createKey_algo == ALGO_SHA3_256 || 
     oper->createKey_algo == ALGO_SHA_256)
     {
-        buffer[idx++] = 0x20;
+        storeLE32(buffer + idx, sizeof(int));
+        idx += 4;
+        fprintf(stdout, "set LEN success\n");
         RAND_bytes(buffer + idx, 0x20);
         idx += 0x20;
     }
@@ -42,11 +64,18 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
         fprintf(stdout, "do_op:type error\n");
         exit(1);
     }
-    buffer[idx++] = TYPE_IV;
-    buffer[idx++] = 0x10;
-    RAND_bytes(buffer + idx, 0x10); 
-    idx += 0x10;
-    
+    if (oper->createKey_isMAC != ISMAC_HMAC)
+    {
+        storeLE16(buffer + idx, TYPE_IV);
+        idx += 2;
+        fprintf(stdout, "set TYPE success\n");
+        storeLE32(buffer + idx, 0x10);
+        idx += 4;
+        fprintf(stdout, "set LEN success\n");
+        RAND_bytes(buffer + idx, 0x10); 
+        idx += 0x10;
+    }
+
     fprintf(stdout, "do_op:do_op_createKey() end\n");
     return idx;
 }
@@ -56,14 +85,14 @@ uint8_t *do_op_encrypt_do(t_enc_dec *oper)
     uint8_t *serial;
     int     result_len;
 
-    result_len = oper->input_len;
+    result_len = oper->data_len;
     serial = (uint8_t *)malloc(result_len);
 
     if (oper->enc_dec_isMAC == ISMAC_NONE)
     {
         if (oper->enc_dec_algo == ALGO_AES128) {
             if (oper->enc_dec_mode == MODE_CBC) {
-                encrypt_payload(EVP_aes_128_cbc(), serial, oper->input_data, oper->input_len, oper->key, oper->iv);
+                encrypt_operation(EVP_aes_128_cbc(), serial, oper->input_data, oper->data_len, oper->key, oper->iv);
             }
             else if (oper->enc_dec_mode == MODE_CTR) {}
         }

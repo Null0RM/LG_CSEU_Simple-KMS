@@ -1,5 +1,45 @@
 #include "../inc/operation.h"
 
+t_operation *deserialize_createKey(uint8_t *data, int   oper_len)
+{
+    printf("deserialize:deserialize_createKey() start\n");
+
+    t_createKey *createKey = malloc(sizeof(t_createKey));
+    int idx = 0;
+
+    while (idx < oper_len) {
+        uint16_t type = *(uint16_t *)(data + idx);
+        idx += 2;
+        uint32_t length = *(uint32_t *)(data + idx);
+        idx += 4;
+
+        switch (type) {
+            case TYPE_ISMAC:
+                createKey->createKey_isMAC = *(int *)(data + idx);
+                break;
+            case TYPE_ALGO:
+                createKey->createKey_algo = *(int *)(data + idx);
+                break;
+            case TYPE_MODE:
+                createKey->createKey_mode = *(int *)(data + idx);
+                break;
+            default:
+                printf("Unknown type: %d\n", type);
+                break;
+        }
+
+        idx += length;
+    }
+
+    t_operation *oper = malloc(sizeof(t_operation));
+    oper->operation_buf = createKey;
+    oper->operation_len = idx;
+
+    printf("deserialize:deserialize_createKey() end\n");
+
+    return oper;
+}
+
 void    *deserialize_tlv(uint8_t *oper, int oper_len, int oper_type)
 {
     fprintf(stdout, "deserialize start\n");
@@ -10,34 +50,7 @@ void    *deserialize_tlv(uint8_t *oper, int oper_len, int oper_type)
 
     if (oper_type == OPERATION_CREATEKEY)
     {
-        t_createKey *tmp = (t_createKey *)malloc(sizeof(t_createKey));
-        if (!tmp)
-        {
-            fprintf(stderr, "deserialize_tlv:malloc()");
-            exit(1);
-        }
-        struct_oper = tmp;
-
-        while (idx < oper_len)
-        {
-            type = oper[idx++];
-
-            if (type == TYPE_ISMAC) {
-                data_len = oper[idx++];
-                memcpy(&tmp->createKey_isMAC, oper + idx, data_len);
-                idx += data_len;
-            }
-            else if (type == TYPE_ALGO){
-                data_len = oper[idx++];
-                memcpy(&tmp->createKey_algo, oper + idx, data_len);
-                idx += data_len;
-            }
-            else if (type == TYPE_MODE){
-                data_len = oper[idx++];
-                memcpy(&tmp->createKey_mode, oper + idx, data_len);
-                idx += data_len;
-            }
-        }
+        deserialize_createKey(oper, oper_len);
     }
     else if (oper_type == OPERATION_ENCRYPT || oper_type == OPERATION_DECRYPT)
     {

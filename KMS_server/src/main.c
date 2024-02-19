@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 
         struct_oper = mq_recv(key_recv_command, &oper_type);
         uint8_t *serial = do_op(struct_oper, oper_type, &len);
+
         mq_send(serial, key_send_result, len);
         
         free(serial);

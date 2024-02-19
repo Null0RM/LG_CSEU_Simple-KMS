@@ -21,8 +21,8 @@ typedef struct s_keys
 
 /* ___FUNCTION_START___ */
 
-int encrypt_payload(const EVP_CIPHER *algo_mode, uint8_t *plainText, uint8_t *cipherText, int cipherText_len, uint8_t *key, uint8_t *iv);
-int decrypt_payload(const EVP_CIPHER *algo_mode, uint8_t *plainText, uint8_t *cipherText, int cipherText_len, uint8_t *key, uint8_t *iv);
+int encrypt_operation(const EVP_CIPHER *algo_mode, uint8_t *plainText, uint8_t *cipherText, int cipherText_len, uint8_t *key, uint8_t *iv);
+int decrypt_operation(const EVP_CIPHER *algo_mode, uint8_t *plainText, uint8_t *cipherText, int cipherText_len, uint8_t *key, uint8_t *iv);
 /* ___FUNCTION_END___ */
 
 #endif

@@ -26,43 +26,6 @@ void    write_response(char *key)
     // printf("write_response() end\n");
 }
 
-uint8_t *decrypt_session_key(uint8_t *cipherText, int cipherText_len) 
-{
-    uint8_t *plainText;
-    int len = 0;
-
-    // printf("boot_proc:decrypt_session_key() start\n");
-    plainText = (uint8_t *)malloc(cipherText_len + 1);
-    if (!plainText) {
-        perror("malloc()");
-        exit(1);
-    }
-
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-
-    if (!ctx) {
-        perror("EVP_CIPHER_CTX_new()");
-        exit(1);
-    }
-    if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, hard_key, NULL)) {
-        perror("EVP_DecryptInit_ex()");
-        exit(1);
-    }
-    if (1 != EVP_DecryptUpdate(ctx, plainText, &len, cipherText, cipherText_len)) {
-        perror("EVP_DecryptUpdate()");
-        exit(-1);
-    }
-    if (1 != EVP_DecryptFinal_ex(ctx, plainText + len, &len)) {
-        perror("EVP_DecryptFinal_ex()");
-        exit(-1);
-    }
-
-    EVP_CIPHER_CTX_free(ctx);
-
-    // printf("boot_proc:decrypt_session_key() end\n");
-    return plainText;
-}
-
 void    recv_response() 
 {
     int     msqid;
@@ -88,12 +51,14 @@ void    recv_response()
         perror("mq_recv:msgctl()");
         exit(1);
     }
-    key = decrypt_session_key(data.data_buf, data.data_len);
-    // printf("key info:\n%s\n", key);
+    if (!(key = malloc(data.data_len + 1)))
+    {
+        perror("boot_proc:recv_response:malloc()");
+        exit(1);
+    }
+    decrypt_operation(EVP_aes_128_ecb(), key, data.data_buf, data.data_len, hard_key, NULL);
     write_response(key);
-
     free(key);
-    // printf("boot_proc:recv_response() end\n");
 }
 
 void    send_request()

@@ -64,15 +64,14 @@ typedef struct s_createKey
 
 typedef struct s_enc_dec
 {
-    int     enc_dec_isMAC; // encdeckey, (hmac, cmac)
-    int     enc_dec_algo; // aes128, aes256, (sha-256, sha3-256);
-    int     enc_dec_mode; // NULL, CBC, CTR
-    uint8_t    *key; // algo에 따라 malloc 후 입력받아서 전송
-    uint8_t    *iv; // algo에 따라 malloc 후 입력받아서 전송
-    // int     input_type; // file, text
-    int     input_len;
-    uint8_t    *input_data; // if(file): path, if(text): plain
-    // uint8_t    *out_name; // output file name
+    int enc_dec_isMAC; // encdeckey, (hmac, cmac)
+    int enc_dec_algo;  // aes128, aes256, (sha-256, sha3-256);
+    int enc_dec_mode;  // NULL, CBC, CTR
+    uint8_t *key;      // algo에 따라 malloc 후 입력받아서 전송
+    uint8_t *iv;       // algo에 따라 malloc 후 입력받아서 전송
+    int key_len;
+    uint8_t *input_data; // if(file): path, if(text): plain
+    int data_len;
 } t_enc_dec;
 
 
@@ -83,6 +82,9 @@ typedef struct s_enc_dec
 /* *************************************************************************************************** */
 /* ___FUNCTION_DEFINE_START___ */
 
+
+void storeLE32(uint8_t *buffer, uint32_t value);
+void storeLE16(uint8_t *buffer, uint16_t value);
 void    *mq_recv(key_t key, int *flag);
 void    *deserialize_tlv(uint8_t *oper, int oper_len, int oper_type);
 uint8_t *do_op(void *struct_oper, int flag, int *len);

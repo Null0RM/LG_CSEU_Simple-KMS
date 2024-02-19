@@ -1,45 +1,6 @@
 #include "../inc/openssl_utils.h"
 #include "../inc/common.h"
 
-int do_encrypt_payload(uint8_t *plaintext, int plaintext_len, uint8_t *key, uint8_t *iv, uint8_t *ciphertext)
-{
-    EVP_CIPHER_CTX *ctx;
-
-    int len;
-
-    int ciphertext_len;
-
-    if(!(ctx = EVP_CIPHER_CTX_new()))
-    {
-        perror("encrypt_payload:do_encrypt_payload:EVP_CIPHER_CTX_new()");
-        exit(1);
-    }
-
-    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-    {
-        perror("encrypt_payload:do_encrypt_payload:EVP_EncryptInit_ex()");
-        exit(1);
-    }
-        
-    if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
-    {
-        perror("encrypt_payload:do_encrypt_payload:EVP_EncryptUpdate()");
-        exit(1);
-    }
-    ciphertext_len = len;
-
-    if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
-    {
-        perror("encrypt_payload:do_encrypt_payload:EVP_EncryptFinal_ex()");
-        exit(1);
-    }
-    ciphertext_len += len;
-
-    EVP_CIPHER_CTX_free(ctx);
-
-    return ciphertext_len;
-}
-
 t_keys get_session_key(void)
 {
     printf("encrypt_payload:get_session_key() start\n");
@@ -59,25 +20,24 @@ t_keys get_session_key(void)
         exit(1);
     }
     idx = strstr(buffer, "key: ");
-    strncpy(ret_key.key, idx, 16);
+    memcpy(ret_key.key, idx + 5, 16);
+    ret_key.key[16] = '\0';
     idx = strstr(buffer, "iv: ");
-    strncpy(ret_key.iv, idx, 16);
+    memcpy(ret_key.iv, idx + 4, 16);
+    ret_key.iv[16] = '\0';
 
     close(fd);
     printf("encrypt_payload:get_session_key() end\n");
     return (ret_key);
 }
 
-int encrypt_payload(uint8_t *buffer, int buffer_len, uint8_t *data)
+int encrypt_payload(uint8_t *buffer, int buffer_len, uint8_t *to_send_data)
 {
     printf("encrypt_payload: start\n"); 
     
     int ret;
     t_keys session_key = get_session_key();
-
-    ret = do_encrypt_payload(buffer, buffer_len, session_key.key, session_key.iv, data);
-
+    ret = encrypt_operation(EVP_aes_128_cbc(), buffer, to_send_data, buffer_len, session_key.key, session_key.iv);
     printf("encrypt_payload: end\n");
-
     return ret;
 }

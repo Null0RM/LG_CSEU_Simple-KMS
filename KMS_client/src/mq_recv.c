@@ -1,41 +1,6 @@
 #include "../inc/command_send.h"
 #include "../inc/openssl_utils.h"
 
-int mq_recv_decrypt_data(uint8_t *plainText, uint8_t *cipherText, int cipherText_len, t_keys keys) {
-    printf("mq_recv:mq_recv_decrypt_data() start\n");
-    
-    int len = 0;
-    int final_len = 0;
-
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) {
-        perror("mq_recv:EVP_CIPHER_CTX_new()");
-        exit(1);
-    }
-    if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, keys.key, keys.iv)) {
-        perror("mq_recv:EVP_DecryptInit_ex()");
-        EVP_CIPHER_CTX_free(ctx);
-        exit(1);
-    }
-
-    if (1 != EVP_DecryptUpdate(ctx, plainText, &len, cipherText, cipherText_len)) {
-        perror("mq_recv:EVP_DecryptUpdate()");
-        EVP_CIPHER_CTX_free(ctx);
-        exit(1);
-    }
-
-    if (1 != EVP_DecryptFinal_ex(ctx, plainText + len, &final_len)) {
-        perror("mq_recv:EVP_DecryptFinal_ex()");
-        EVP_CIPHER_CTX_free(ctx);
-        exit(1);
-    }
-    len += final_len;
-    EVP_CIPHER_CTX_free(ctx);
-    
-    printf("mq_recv:mq_recv_decrypt_data() end\n");
-    return len;
-}
-
 uint8_t * mq_recv_data(key_t key, int *recv_len, int *oper_type)
 {
     fprintf(stdout, "mq_recv:mq_recv_data() end\n");
@@ -101,7 +66,7 @@ int    mq_recv(key_t key)
     plainText[cipher_len] = '\0';
 
     session_key = get_session_key();
-    result_len = mq_recv_decrypt_data(plainText, cipherText, cipher_len, session_key);
+    result_len = decrypt_operation(EVP_aes_128_cbc(), plainText, cipherText, cipher_len, session_key.key, session_key.iv);
     free(cipherText);
 
     if (deserialize_tlv(plainText, oper_type, result_len) == EXIT_FAILURE)

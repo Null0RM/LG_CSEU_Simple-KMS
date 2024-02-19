@@ -12,51 +12,6 @@
 static uint8_t hard_key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 
                                 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
 
-
-uint8_t *encrypt_response(uint8_t *plainText, int plainText_len, int *response_len) {
-    uint8_t *cipherText;
-    int len = 0;
-
-    printf("key_derivation:encrypt_response() plainLength: %d start\n", plainText_len);
-    printf("%s\n", plainText);
-
-    int cipherText_len = plainText_len + 16 - plainText_len % 16;
-    cipherText = (uint8_t *)malloc(cipherText_len + 1);
-    if (!cipherText) {
-        perror("malloc()");
-        exit(1);
-    }
-
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx) {
-        perror("EVP_CIPHER_CTX_new()");
-        exit(1);
-    }
-
-    if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, hard_key, NULL)) {
-        perror("EVP_EncryptInit_ex()");
-        exit(1);
-    }
-
-    if (1 != EVP_EncryptUpdate(ctx, cipherText, &len, plainText, plainText_len)) {
-        perror("EVP_EncryptUpdate()");
-        exit(1);
-    }
-
-    int final_len = 0;
-    if (1 != EVP_EncryptFinal_ex(ctx, cipherText + len, &final_len)) {
-        perror("EVP_EncryptFinal_ex()");
-        exit(-1);
-    }
-    len += final_len;
-    *response_len = len;
-    EVP_CIPHER_CTX_free(ctx);
-
-    printf("key_derivation:encrypt_response() cipherLength:%d end\n", cipherText_len);
-
-    return cipherText;
-}
-
 uint8_t    *make_response(uint8_t *key, uint8_t *iv, t_data data, int *response_len)
 {
     RAND_status();
@@ -72,7 +27,7 @@ uint8_t    *make_response(uint8_t *key, uint8_t *iv, t_data data, int *response_
     RAND_bytes(iv, 16);
 
     plain_len = strlen(data.data_buf) + 45; // key, iv, string
-    tmp_response = (uint8_t *)malloc(sizeof(uint8_t) * plain_len);
+    tmp_response = (uint8_t *)malloc(plain_len);
     fd = open("../security_data/session_key_list.txt", O_WRONLY);
     if (!fd)
     {
@@ -81,7 +36,12 @@ uint8_t    *make_response(uint8_t *key, uint8_t *iv, t_data data, int *response_
     }
     sprintf(tmp_response, "%s\nkey: %s\niv: %s", data.data_buf, key, iv);
     write(fd, tmp_response, plain_len);
-    ret = encrypt_response(tmp_response, plain_len, response_len);
+    if (!(ret = malloc(plain_len + 16 - plain_len % 16)))
+    {
+        perror("key_derivation:make_response:malloc()");
+        exit(1);
+    }
+    *response_len = encrypt_operation(EVP_aes_128_ecb(), tmp_response, ret, plain_len, hard_key, NULL);
 
     close(fd);
     free(tmp_response);

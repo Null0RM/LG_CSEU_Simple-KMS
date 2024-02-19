@@ -65,7 +65,7 @@ int mq_send(uint8_t *to_send, key_t key, int len)
 
     session_key = get_session_key();
     send_data.data_type = OPERATION_CREATEKEY;
-    send_data.data_len = do_encrypt_data(cipher, to_send, len, session_key);
+    send_data.data_len = encrypt_operation(EVP_aes_128_cbc(), to_send, cipher, len, session_key.key, session_key.iv);
     memcpy(send_data.data_buf, cipher, send_data.data_len);
     if (!do_mq_send(send_data, key))
     {

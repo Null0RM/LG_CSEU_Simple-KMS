@@ -1,45 +1,5 @@
 #include "../inc/operation.h"
 
-int dec_payload(uint8_t *plainText, uint8_t *cipherText, int cipherText_len, t_keys keys)
-{
-    printf("mq_recv:dec_payload() start\n");
-
-    int len = 0;
-    int final_len = 0;
-
-    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
-    if (!ctx)
-    {
-        perror("mq_recv:EVP_CIPHER_CTX_new()");
-        exit(1);
-    }
-    if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, keys.key, keys.iv))
-    {
-        perror("mq_recv:EVP_DecryptInit_ex()");
-        EVP_CIPHER_CTX_free(ctx);
-        exit(1);
-    }
-
-    if (1 != EVP_DecryptUpdate(ctx, plainText, &len, cipherText, cipherText_len))
-    {
-        perror("mq_recv:EVP_DecryptUpdate()");
-        EVP_CIPHER_CTX_free(ctx);
-        exit(1);
-    }
-
-    if (1 != EVP_DecryptFinal_ex(ctx, plainText + len, &final_len))
-    {
-        perror("mq_recv:EVP_DecryptFinal_ex()");
-        EVP_CIPHER_CTX_free(ctx);
-        exit(1);
-    }
-    len += final_len;
-    EVP_CIPHER_CTX_free(ctx);
-
-    printf("mq_recv:dec_payload() end\n");
-    return len;
-}
-
 t_keys get_session_key()
 {
     printf("mq_recv:get_session_key() start\n");
@@ -59,16 +19,17 @@ t_keys get_session_key()
         exit(1);
     }
     idx = strstr(buffer, "key: ");
-    strncpy(ret_key.key, idx, 16);
+    memcpy(ret_key.key, idx + 5, 16);
     idx = strstr(buffer, "iv: ");
-    strncpy(ret_key.iv, idx, 16);
+    memcpy(ret_key.iv, idx + 4, 16);
 
     close(fd);
     printf("mq_recv:get_session_key() end\n");
+
     return (ret_key);
 }
 
-uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type)
+uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type, t_keys session_key)
 {
     /*
     key: mq session key ID
@@ -76,19 +37,15 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type)
     oper_type: operation type
     */
     fprintf(stdout, "mq_recv:mq_recv_payload() start\n");
-
+  
+    int tmp_length;
     int msqid;
     t_data recv_data;
     uint8_t *payload = NULL;
     uint8_t *newPayload = NULL;
+    uint8_t tmp_data[BUFFER_SIZE] = {};
     int prev_size = 0;
 
-    payload = (uint8_t *)malloc(1);
-    if (!payload)
-    {
-        perror("mq_recv:malloc()");
-        exit(1);
-    }
     if (-1 == (msqid = msgget(key, IPC_CREAT | 0666)))
     {
         perror("mq_recv:msgget()");
@@ -96,6 +53,7 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type)
     }
     while (1)
     {
+        fprintf(stdout, "receiving messgae from client...\n");
         if (-1 == (msgrcv(msqid, &recv_data, sizeof(t_data) - sizeof(long), 0, 0)))
         {
             perror("mq_recv:msgrcv()");
@@ -124,7 +82,11 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type)
             }
             payload = newPayload; // 이렇게 해야 heap 영역 공간 부족 이슈를 해결할 수 있다.
         }
-        memcpy(payload + prev_size, recv_data.data_buf, recv_data.data_len);
+        for(int i = 0; i < 32; i++)
+            printf("%02x ", recv_data.data_buf[i]);
+        printf("\n");
+        tmp_length = decrypt_operation(EVP_aes_128_cbc(), tmp_data, recv_data.data_buf, recv_data.data_len, session_key.key, session_key.iv);
+        memcpy(payload + prev_size, tmp_data, tmp_length);
         prev_size += recv_data.data_len;
 
         if (recv_data.data_fin == 1)
@@ -152,30 +114,30 @@ void *mq_recv(key_t key, int *flag)
     int oper_type = 0;
     t_keys session_key;
     uint8_t *payload;
-    uint8_t *operation;
     void *struct_oper;
 
     session_key = get_session_key();
-    payload = mq_recv_payload(key, &recv_len, flag);
+
+    for(int i = 0; i < 32; i++)
+        printf("%02x ", session_key.key[i]);
+    printf("\n");
+    for(int i = 0; i < 32; i++)
+        printf("%02x ", session_key.iv[i]);
+    printf("\n");
+
+    payload = mq_recv_payload(key, &recv_len, flag, session_key);
     if (!payload)
     {
         perror("mq_recv:mq_recv_payload()");
         exit(1);
     }
+    
+    for(int i = 0; i < recv_len; i++)
+        fprintf(stdout, "%02x ", payload[i]);
+    fprintf(stdout, "\n");
 
-    operation = (uint8_t *)malloc(recv_len + 1);
-    if (!operation)
-    {
-        perror("mq_recv:malloc()");
-        exit(1);
-    }
-    operation[recv_len] = '\0';
-    oper_len = dec_payload(operation, payload, recv_len, session_key);
-
+    struct_oper = deserialize_tlv(payload, oper_len, *flag);
     free(payload);
-
-    struct_oper = deserialize_tlv(operation, oper_len, *flag);
-    free(operation);
 
     printf("mq_recv end\n");
 
