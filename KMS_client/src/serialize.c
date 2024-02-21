@@ -15,7 +15,7 @@ void storeLE32(uint8_t *buffer, uint32_t value) {
 
 uint8_t *serialize_createKey(t_operation *oper, uint8_t *ret)
 {
-    printf("serialize:serialize_createKey() start\n");
+    // printf("serialize:serialize_createKey() start\n");
 
     t_createKey *createKey = oper->operation_buf;
     int         idx = 0;
@@ -43,12 +43,12 @@ uint8_t *serialize_createKey(t_operation *oper, uint8_t *ret)
     
     oper->operation_len = idx;
 
-    printf("serialize:serialize_createKey() end\n");
-}
+    // printf("serialize:serialize_createKey() end\n");
+}   
 
 void    serialize_enc_dec(t_operation *oper, uint8_t *ret)
 {
-    printf("serialize:serialize_createKey() start\n");
+    // printf("serialize:serialize_createKey() start\n");
     t_enc_dec *enc_dec = oper->operation_buf;
     int idx = 0;
 
@@ -100,12 +100,12 @@ void    serialize_enc_dec(t_operation *oper, uint8_t *ret)
     free(enc_dec->input_data);
     free(oper->operation_buf);
 
-    printf("serialize:serialize_createKey() end\n");
+    // printf("serialize:serialize_createKey() end\n");
 }
 
 uint8_t *serialize(t_operation *oper, int payload_len)
 {
-    printf("serialize start\n");
+    // printf("serialize start\n");
 
     uint8_t *ret;
     
@@ -121,7 +121,7 @@ uint8_t *serialize(t_operation *oper, int payload_len)
     else if (oper->operation_type == OPERATION_ENCRYPT || oper->operation_type == OPERATION_DECRYPT)
         serialize_enc_dec(oper, ret);
 
-    printf("serialize end\n");
+    // printf("serialize end\n");
 
     return (ret);
 }

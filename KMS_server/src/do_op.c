@@ -6,8 +6,7 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
     fprintf(stdout, "do_op:do_op_createKey() start\n");
     int     idx = 0;
     RAND_status();
-    fprintf(stdout, "RAND_status() success\n");
-
+    
     storeLE16(buffer + idx, TYPE_ISMAC);
     idx += 2;
     fprintf(stdout, "set TYPE success\n");
@@ -16,7 +15,7 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
     fprintf(stdout, "set LEN success\n");
     memcpy(buffer + idx, &(oper->createKey_isMAC), sizeof(int));
     idx += sizeof(int);
-    fprintf(stdout, "do_op_createKey:serialize_isMAC:success\n");
+    fprintf(stdout, "do_op_createKey:serialize_isMAC:success %d\n", oper->createKey_isMAC);
 
     storeLE16(buffer + idx, TYPE_ALGO);
     idx += 2;
@@ -26,7 +25,7 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
     fprintf(stdout, "set LEN success\n");
     memcpy(buffer + idx, &(oper->createKey_algo), sizeof(int));
     idx += sizeof(int);
-    fprintf(stdout, "do_op_createKey:serialize_algo:success\n");
+    fprintf(stdout, "do_op_createKey:serialize_algo:success %d\n", oper->createKey_algo);
 
     storeLE16(buffer + idx, TYPE_MODE);
     idx += 2;
@@ -36,15 +35,17 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
     fprintf(stdout, "set LEN success\n");
     memcpy(buffer + idx, &(oper->createKey_mode), sizeof(int));
     idx += sizeof(int);
-    fprintf(stdout, "do_op_createKey:serialize_mode:success\n");
+    fprintf(stdout, "do_op_createKey:serialize_mode:success %d\n", oper->createKey_mode);
+
+    logging(30, buffer, ">>send_data_buffer:");
 
     storeLE16(buffer + idx, TYPE_KEY);
     idx += 2;
     fprintf(stdout, "set TYPE success\n");
     if (oper->createKey_algo == ALGO_AES128)
     {
-        storeLE32(buffer + idx, sizeof(int));
-        idx += 4;
+        storeLE32(buffer + idx, 0x10);
+        idx += sizeof(int);
         fprintf(stdout, "set LEN success\n");
         RAND_bytes(buffer + idx, 0x10);
         idx += 0x10;
@@ -53,8 +54,8 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
         oper->createKey_algo == ALGO_SHA3_256 || 
     oper->createKey_algo == ALGO_SHA_256)
     {
-        storeLE32(buffer + idx, sizeof(int));
-        idx += 4;
+        storeLE32(buffer + idx, 0x20);
+        idx += sizeof(int);
         fprintf(stdout, "set LEN success\n");
         RAND_bytes(buffer + idx, 0x20);
         idx += 0x20;
@@ -77,10 +78,11 @@ int do_op_createKey(t_createKey *oper, uint8_t *buffer)
     }
 
     fprintf(stdout, "do_op:do_op_createKey() end\n");
+
     return idx;
 }
 
-uint8_t *do_op_encrypt_do(t_enc_dec *oper)
+uint8_t *do_op_encrypt(t_enc_dec *oper)
 {
     uint8_t *serial;
     int     result_len;
@@ -92,13 +94,24 @@ uint8_t *do_op_encrypt_do(t_enc_dec *oper)
     {
         if (oper->enc_dec_algo == ALGO_AES128) {
             if (oper->enc_dec_mode == MODE_CBC) {
-                encrypt_operation(EVP_aes_128_cbc(), serial, oper->input_data, oper->data_len, oper->key, oper->iv);
+                if (encrypt_operation(EVP_aes_128_cbc(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+
             }
-            else if (oper->enc_dec_mode == MODE_CTR) {}
+            else if (oper->enc_dec_mode == MODE_CTR) {
+                if (encrypt_operation(EVP_aes_128_ctr(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+            }
         }
         else if (oper->enc_dec_algo == ALGO_AES256) {
-            if (oper->enc_dec_mode == MODE_CBC) {}
-            else if (oper->enc_dec_mode == MODE_CTR) {}
+            if (oper->enc_dec_mode == MODE_CBC) {
+                if (encrypt_operation(EVP_aes_256_cbc(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+            }
+            else if (oper->enc_dec_mode == MODE_CTR) {
+                if (encrypt_operation(EVP_aes_256_ctr(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+            }
         }
     }
     else if (oper->enc_dec_isMAC == ISMAC_CMAC)
@@ -116,58 +129,120 @@ uint8_t *do_op_encrypt_do(t_enc_dec *oper)
     }
     else
     {
-        //else logic
+        fprintf(stdout, "invalid algorithm input\n");
+        exit(1);
     }
 
     return (serial);
 }
 
-uint8_t *do_op_encrypt(t_enc_dec *oper, uint8_t *buffer)
+uint8_t *do_op_decrypt(t_enc_dec *oper)
 {
-    fprintf(stdout, "do_op:do_op_createKey() start\n");
-    char    *serial;
-    int     idx = 0;
-    int     res_len;
+    uint8_t *serial;
+    int     result_len;
 
-    buffer[idx++] = TYPE_ISMAC;
-    buffer[idx++] = sizeof(int);
-    memcpy(buffer + idx, &(oper->enc_dec_isMAC), sizeof(int));
-    idx += sizeof(int);
+    result_len = oper->data_len;
+    serial = (uint8_t *)malloc(result_len);
 
-    buffer[idx++] = TYPE_ALGO;
-    buffer[idx++] = sizeof(int);
-    memcpy(buffer + idx, &(oper->enc_dec_algo), sizeof(int));
-    idx += sizeof(int);
+    if (oper->enc_dec_isMAC == ISMAC_NONE)
+    {
+        if (oper->enc_dec_algo == ALGO_AES128) {
+            if (oper->enc_dec_mode == MODE_CBC) {
+                if (decrypt_operation(EVP_aes_128_cbc(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+            }
+            else if (oper->enc_dec_mode == MODE_CTR) {
+                if (decrypt_operation(EVP_aes_128_ctr(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+            }
+        }
+        else if (oper->enc_dec_algo == ALGO_AES256) {
+            if (oper->enc_dec_mode == MODE_CBC) {
+                if (decrypt_operation(EVP_aes_256_cbc(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+            }
+            else if (oper->enc_dec_mode == MODE_CTR) {
+                if (decrypt_operation(EVP_aes_256_ctr(), serial, oper->input_data, oper->data_len, oper->key, oper->iv) == OPERATION_FAILURE)
+                    return 0;
+            }
+        }
+    }
 
-    buffer[idx++] = TYPE_MODE;
-    buffer[idx++] = sizeof(int);
-    memcpy(buffer + idx, &(oper->enc_dec_mode), sizeof(int));
-    idx += sizeof(int);
-
-    serial = do_op_encrypt_do(oper);
-
-    fprintf(stdout, "do_op:do_op_createKey() end\n");
+    return (serial);
 }
 
-uint8_t    *do_op(void *struct_oper, int oper_type, int *len)
+uint8_t    *do_op(t_operation *struct_oper, int oper_type, int *len)
 {
     fprintf(stdout, "do_op start\n");
     uint8_t     *serial;
-    uint8_t     buffer[BUFFER_SIZE];
+    uint8_t     *buffer;
 
     if (oper_type == OPERATION_CREATEKEY) {
-        t_createKey *tmp = (t_createKey *)struct_oper;
-        *len = do_op_createKey(struct_oper, buffer);
-        serial = (uint8_t *)malloc(sizeof(uint8_t) * *len + 1);
+        buffer = (uint8_t *)malloc(BUFFER_SIZE);
+        *len = do_op_createKey((t_createKey *)(struct_oper->operation_buf), buffer);
+        serial = (uint8_t *)malloc(*len + 1);
         memcpy(serial, buffer, *len);
     }
     else if (oper_type == OPERATION_ENCRYPT) {
-        t_enc_dec *tmp = (t_enc_dec *)struct_oper;
-        serial = do_op_encrypt(struct_oper, buffer);
-    }
-    else if (oper_type == OPERATION_DECRYPT) {}
-    else {}
+        printf("do_op:encrytion_ready\n");
+        t_enc_dec *tmp = (t_enc_dec *)(struct_oper->operation_buf);
+        if (!tmp)
+        {
+            perror("align t_enc_dec");
+            exit(1);
+        }
+        buffer = (uint8_t *)malloc(tmp->data_len);
+        if (!buffer)
+        {
+            perror("do_op:malloc()");
+            exit(1);
+        }
+        buffer = do_op_encrypt(tmp);
+        if (!buffer)
+        {
+            fprintf(stdout, "do_op:do_op_encrypt() failure\n");
+            return 0;
+        }
+        *len = tmp->data_len + 16 - tmp->data_len % 16;
 
+        logging(*len, buffer, ">> do_op:buffer");
+        serial = (uint8_t *)malloc(*len + 1);
+        memcpy(serial, buffer, *len);
+        printf("do_op:encrytion_done\n");
+    }
+    else if (oper_type == OPERATION_DECRYPT) {
+        printf("do_op:decryption_ready\n");
+        t_enc_dec *tmp = (t_enc_dec *)(struct_oper->operation_buf);
+        if (!tmp)
+        {
+            perror("align t_enc_dec");
+            exit(1);
+        }
+        buffer = (uint8_t *)malloc(tmp->data_len);
+        if (!buffer)
+        {
+            perror("do_op:malloc()");
+            exit(1);
+        }
+        buffer = do_op_decrypt(tmp);
+        if (!buffer)
+        {
+            perror("do_op:do_op_decrypt()");
+            exit(1);
+        }
+        *len = tmp->data_len;
+
+        logging(*len, buffer, ">> do_op:buffer");
+        serial = (uint8_t *)malloc(*len + 1);
+        memcpy(serial, buffer, *len);
+        printf("do_op:decryption_done\n");
+    }
+    else {
+        fprintf(stdout, "oper_type_error\n");
+        exit(1);
+    }
+    
+    free(buffer);
     fprintf(stdout, "do_op end\n");
 
     return (serial);

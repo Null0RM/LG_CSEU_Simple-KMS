@@ -41,8 +41,12 @@ uint8_t    *make_response(uint8_t *key, uint8_t *iv, t_data data, int *response_
         perror("key_derivation:make_response:malloc()");
         exit(1);
     }
-    *response_len = encrypt_operation(EVP_aes_128_ecb(), tmp_response, ret, plain_len, hard_key, NULL);
-
+    *response_len = encrypt_operation(EVP_aes_128_ecb(), ret, tmp_response, plain_len, hard_key, NULL);
+    printf("send_sessionkey_decrypt: \n");
+    for(int i = 0; i < *response_len; i++)
+        printf("%02x ", ret[i]);
+    printf("plain len: %d\n", plain_len);
+    printf("response len: %d\n", *response_len);
     close(fd);
     free(tmp_response);
     printf("key_derivation:make_response() end\n");

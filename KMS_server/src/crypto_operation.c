@@ -26,7 +26,7 @@ int encrypt_operation(const EVP_CIPHER * algo_mode, uint8_t *plainText, uint8_t 
     if (1 != EVP_EncryptFinal_ex(ctx, plainText + len, &final_len)) {
         perror("crypto_operation:EVP_EncryptFinal_ex()");
         EVP_CIPHER_CTX_free(ctx);
-        exit(1);
+        return OPERATION_FAILURE;
     }
     len += final_len;
     EVP_CIPHER_CTX_free(ctx);
@@ -64,7 +64,7 @@ int decrypt_operation(const EVP_CIPHER * algo_mode, uint8_t *plaintext, uint8_t 
     if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
     {
         perror("crypto_operation:decrypt_operation:EVP_DecryptFinal_ex()");
-        exit(1);
+        return OPERATION_FAILURE;
     }
     plaintext_len += len;
 

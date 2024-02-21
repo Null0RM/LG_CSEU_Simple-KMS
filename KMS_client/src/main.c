@@ -13,10 +13,9 @@ int main()
         perror("verify failed");
         exit(0);
     }
-    printf("session key derivation success\n");
+    // printf("session key derivation success\n");
     // command process
     command_proc(key_send_command);
     mq_recv(key_recv_result);
     printf("session end\n");
-
 } 

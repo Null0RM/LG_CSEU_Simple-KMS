@@ -1,9 +1,17 @@
 #include "../inc/openssl_utils.h"
 #include "../inc/common.h"
 
+static void    logging(int length, uint8_t * data, uint8_t * str)
+{
+    fprintf(stdout, "%s\n", str);
+    for(int i = 0; i < length; i++)
+        fprintf(stdout, "%02x ", data[i]);
+    fprintf(stdout, "\n");
+}
+
 t_keys get_session_key(void)
 {
-    printf("encrypt_payload:get_session_key() start\n");
+    // printf("encrypt_payload:get_session_key() start\n");
     int     fd;
     t_keys  ret_key;
     uint8_t buffer[BUFFER_SIZE];
@@ -27,17 +35,20 @@ t_keys get_session_key(void)
     ret_key.iv[16] = '\0';
 
     close(fd);
-    printf("encrypt_payload:get_session_key() end\n");
+    // printf("encrypt_payload:get_session_key() end\n");
     return (ret_key);
 }
 
 int encrypt_payload(uint8_t *buffer, int buffer_len, uint8_t *to_send_data)
 {
-    printf("encrypt_payload: start\n"); 
+    // printf("encrypt_payload: start\n"); 
     
     int ret;
     t_keys session_key = get_session_key();
-    ret = encrypt_operation(EVP_aes_128_cbc(), buffer, to_send_data, buffer_len, session_key.key, session_key.iv);
-    printf("encrypt_payload: end\n");
+    // logging(16, session_key.key, "session key");
+    // logging(16, session_key.iv, "session iv");
+    
+    ret = encrypt_operation(EVP_aes_128_cbc(), to_send_data, buffer, buffer_len, session_key.key, session_key.iv);
+    // printf("encrypt_payload: end\n");
     return ret;
 }

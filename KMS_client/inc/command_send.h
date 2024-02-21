@@ -23,6 +23,7 @@
 #define OPERATION_CREATEKEY 0x00000001 // by KMIP enumeration
 #define OPERATION_ENCRYPT 0x0000001f   // by KMIP enumeration
 #define OPERATION_DECRYPT 0x00000020   // by KMIP enumeration
+#define OPERATION_FAILURE 0x00000099
 // is_MAC
 #define ISMAC_NONE 0x00000001 // 임의 지정
 #define ISMAC_HMAC 0x00000002 // 임의 지정
@@ -43,13 +44,13 @@
 #define ENC_DEC_ENC 0x00000001
 #define ENC_DEC_DEC 0x00000002
 // types
-#define TYPE_ISMAC 0x01
-#define TYPE_ALGO 0x02
-#define TYPE_MODE 0x03
-#define TYPE_KEY 0x04
-#define TYPE_IV 0x05
-#define TYPE_INPUT_TYPE 0x06
-#define TYPE_INPUT_DATA 0x07
+#define TYPE_ISMAC 0x0001
+#define TYPE_ALGO 0x0002
+#define TYPE_MODE 0x0003
+#define TYPE_KEY 0x0004
+#define TYPE_IV 0x0005
+#define TYPE_INPUT_TYPE 0x0006
+#define TYPE_INPUT_DATA 0x0007
 /* __define_end__*/
 /* __typedef_start__*/
 
@@ -62,27 +63,27 @@ typedef struct s_to_send
 
 typedef struct s_operation
 {
-    long operation_type; // createkey, encryption, decryption
-    int operation_len;   // size of operation_buf
-    void *operation_buf; // t_createKey, t_decryption, t_encryption
+    long operation_type;            // createkey, encryption, decryption
+    int operation_len;              // size of operation_buf
+    void *operation_buf;            // t_createKey, t_decryption, t_encryption
 } t_operation;
 
 typedef struct s_createKey
 {
-    int createKey_isMAC; // encdeckey, hmac, cmac
-    int createKey_algo;  // aes128, aes256, sha-256, sha3-256;
-    int createKey_mode;  // NULL, CBC, CTR
+    int createKey_isMAC;           // encdeckey, hmac, cmac
+    int createKey_algo;            // aes128, aes256, sha-256, sha3-256;
+    int createKey_mode;            // NULL, CBC, CTR
 } t_createKey;
 
 typedef struct s_enc_dec
 {
-    int enc_dec_isMAC; // encdeckey, (hmac, cmac)
-    int enc_dec_algo;  // aes128, aes256, (sha-256, sha3-256);
-    int enc_dec_mode;  // NULL, CBC, CTR
-    uint8_t *key;      // algo에 따라 malloc 후 입력받아서 전송
-    uint8_t *iv;       // algo에 따라 malloc 후 입력받아서 전송
+    int enc_dec_isMAC;          // encdeckey, (hmac, cmac)
+    int enc_dec_algo;           // aes128, aes256, (sha-256, sha3-256);
+    int enc_dec_mode;           // NULL, CBC, CTR
+    uint8_t *key;               // algo에 따라 malloc 후 입력받아서 전송
+    uint8_t *iv;                // algo에 따라 malloc 후 입력받아서 전송
     int key_len;
-    uint8_t *input_data; // if(file): path, if(text): plain
+    uint8_t *input_data;        // if(file): path, if(text): plain
     int data_len;
 } t_enc_dec;
 

@@ -31,11 +31,9 @@ void    recv_response()
     int     msqid;
     t_data  data;
     int     check = 0;
-    uint8_t *key;
-    uint8_t *tmp_data;
+    uint8_t *session_key;
 
     // printf("boot_proc:recv_response() start\n");
-    tmp_data = (uint8_t *)malloc(strlen(data.data_buf));
     if (-1 == (msqid = msgget((key_t)5678, IPC_CREAT | 0666)))
     {
         perror("boot_proc:msgget()");
@@ -46,19 +44,20 @@ void    recv_response()
         perror("boot_proc:msgrcv()");
         exit(1);
     }
+    if (!(session_key = malloc(data.data_len + 1)))
+    {
+        perror("boot_proc:recv_response:malloc()");
+        exit(1);
+    }
+    decrypt_operation(EVP_aes_128_ecb(), session_key, data.data_buf, data.data_len, hard_key, NULL);
     if (-1 == msgctl(msqid, IPC_RMID, 0))
     {
         perror("mq_recv:msgctl()");
         exit(1);
     }
-    if (!(key = malloc(data.data_len + 1)))
-    {
-        perror("boot_proc:recv_response:malloc()");
-        exit(1);
-    }
-    decrypt_operation(EVP_aes_128_ecb(), key, data.data_buf, data.data_len, hard_key, NULL);
-    write_response(key);
-    free(key);
+    write_response(session_key);
+    free(session_key);
+    // printf("boot_proc:recv_response() end\n");
 }
 
 void    send_request()
@@ -69,7 +68,7 @@ void    send_request()
 
     // printf("boot_proc:send_request() start\n");
     data.data_type = CK_GET_SESSION_KEY;
-    sprintf(data.data_buf, "uid=%-12d", uid);
+    sprintf(data.data_buf, "uid=%-6d", uid);
     data.data_len = strlen(data.data_buf);
 
     if (-1 == (msqid = msgget((key_t)1234, IPC_CREAT | 0666)))
@@ -93,6 +92,5 @@ int boot_proc()
     recv_response();
 
     // printf("*** boot_proc end ***\n");
-
     return (1);
 }

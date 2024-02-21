@@ -50,7 +50,7 @@ void    send_response(t_data data);
 int    verify_uid(t_data data);
 void    key_derivation();
 
-int mq_send(uint8_t *to_send, key_t key, int len);
+int mq_send(uint8_t *to_send, key_t key, int len, int oper_type);
 
 /* ___FUNCTION_END___ */
 

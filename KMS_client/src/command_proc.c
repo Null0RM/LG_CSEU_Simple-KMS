@@ -28,74 +28,142 @@ void command_help()
     close(fd);
 }
 
-int command_decryption(t_operation *oper, key_t key)
+uint8_t *input_enc_dec_target_file(void)
 {
-    int choose;
-    int payload_len = 0;
+    // fprintf(stdout, "command_proc:input_enc_dec_target_file:start\n");
+    
+    uint8_t file_name[BUFFER_SIZE] = {};
+    uint8_t buffer[BUFFER_SIZE] = {};
+    uint8_t *ret = NULL;
+    uint8_t *tmp = NULL;
+    int     read_bytes;
+    int     prev_size = 0;
+    int     fd;
 
-    printf("\n<Choose decryption algorithm type>\n");
-    printf("1. AES128_CBC\t     2. AES128_CTR\n");
-    printf("3. AES256_CBC\t     4. AES256_CTR\n");
-
-    printf("command_proc:command_decryption() start\n");
-
-    oper->operation_type = OPERATION_DECRYPT;
-    oper->operation_buf = (t_enc_dec *)malloc(sizeof(t_enc_dec));
-    t_enc_dec *enc_dec = oper->operation_buf;
-
-    scanf("%d", &choose);
-    switch (choose)
+    fprintf(stdout, "type your file path\n>> ");
+    while (getchar() != '\n');
+    fgets(file_name, BUFFER_SIZE, stdin);
+    file_name[strlen(file_name) - 1] = '\0';
+    if ((fd = open(file_name, O_RDONLY)) < 0)
     {
-    case 1:
-        enc_dec->enc_dec_mode = MODE_CBC;
-    case 2:
-        enc_dec->enc_dec_isMAC = ISMAC_NONE;
-        enc_dec->enc_dec_algo = ALGO_AES128;
-        if (choose == 2)
-            enc_dec->enc_dec_mode = MODE_CTR;
-        break;
-    case 3:
-        enc_dec->enc_dec_mode = MODE_CBC;
-    case 4:
-        enc_dec->enc_dec_isMAC = ISMAC_NONE;
-        enc_dec->enc_dec_algo = ALGO_AES256;
-        if (choose == 4)
-            enc_dec->enc_dec_mode = MODE_CTR;
-        break;
-    default:
-        printf("Invalid input. please choose [help]\n");
+        perror("command_proc:input_enc_dec_target_file()");
         exit(1);
     }
-
-    // key -> file or txt
-    // iv -> file or txt
-    // input_type -> file or txt
-    // input_data -? file or txt
-
-    oper->operation_len = sizeof(oper->operation_buf);
-
-    return (payload_len);
+    while ((read_bytes = read(fd, buffer, BUFFER_SIZE)) > 0)
+    {
+        if (ret == NULL)
+        {
+            ret = (uint8_t *)malloc(read_bytes);
+            if (!ret)
+            {
+                perror("command_proc:input_enc_dec_target_file:malloc()");
+                exit(1);
+            }
+        }
+        else
+        {
+            tmp = (uint8_t *)realloc(buffer, prev_size + read_bytes);
+            if (!tmp)
+            {
+                perror("command_proc:input_enc_dec_target_file:realloc()");
+                exit(1);
+            }
+            ret = tmp;
+        }
+        memcpy(ret + prev_size, buffer, read_bytes);
+        prev_size += read_bytes;
+    }
+    close(fd);
+    // fprintf(stdout, "command_proc:input_enc_dec_target_file:end\n");
+    return (ret);
 }
 
-void encryption_menu_1(void)
+uint8_t *input_enc_dec_target_text(void)
 {
-    fprintf(stdout, "\n<Choose encryption algorithm type>\n");
-    fprintf(stdout, "1. AES128_CBC\t     2. AES128_CTR\n");
-    fprintf(stdout, "3. AES256_CBC\t     4. AES256_CTR\n");
-    fprintf(stdout, "5. HMAC_SHA-256\t     6. HMAC_SHA3-256\n");
-    fprintf(stdout, "7. CMAC_AES128_CBC   8. CMAC_AES128_CTR\n>> ");
+    // fprintf(stdout, "command_proc:input_enc_dec_target_text:start\n");
+
+    uint8_t buffer[BUFFER_SIZE];
+    uint8_t *ret = NULL;
+    int total_size = 0;
+    int size = 0;
+
+    fprintf(stdout, "type your plain text\n>> ");
+    while (1)
+    {
+        while (getchar() != '\n');
+        fgets(buffer, BUFFER_SIZE, stdin);
+        size = strlen(buffer);
+        total_size += size;
+        if (ret == NULL)
+        {
+            ret = (uint8_t *)malloc(total_size + 1);
+            if (!ret)
+            {
+                perror("command_proc:input_enc_dec_target_text:malloc()");
+                exit(1);
+            }
+            memcpy(ret, buffer, total_size + 1);
+        }
+        else
+        {
+            ret = (uint8_t *)realloc(ret, total_size + 1);
+            if (!ret)
+            {
+                perror("command_proc:input_enc_dec_target_text:realloc()");
+                exit(1);
+            }
+            strncat(ret, buffer, size + 1);
+        }
+        if (buffer[size - 1] == '\n')
+        {
+            *(ret + total_size - 1) = 0;
+            break;
+        }
+    }
+
+    // fprintf(stdout, "command_proc:input_encryption_target_text:end\n");
+    return (ret);
 }
 
-void encryption_menu_2(void)
+void    parse_plain_key_file(int key_size, t_enc_dec *enc_dec)
 {
-    fprintf(stdout, "\n<How would you enter a key?>\n");
-    fprintf(stdout, "1. plain key text\n");
-    fprintf(stdout, "2. key file\n");
+    // fprintf(stdout, "command_proc:parse_plain_key_file:start\n");
+
+    uint8_t file_name[BUFFER_SIZE] = {};
+    uint8_t buffer[BUFFER_SIZE] = {}; 
+    uint8_t *idx;
+    int     fd;
+    int     read_bytes;
+
+    fprintf(stdout, "key file path\n>> ");
+    while (getchar() != '\n');
+    fgets(file_name, BUFFER_SIZE, stdin);
+    file_name[strlen(file_name) - 1] = '\0';
+    if ((fd = open(file_name, O_RDONLY)) < 0)
+    {
+        fprintf(stdout, "[input file name: %s]\n", file_name);
+        perror("command_proc:parse_plain_key_file:open()");
+        exit(1);
+    }
+    if (read(fd, buffer, BUFFER_SIZE) < 0)
+    {
+        perror("command_proc:parse_plain_key_file:read()");
+        exit(1);        
+    }
+    idx = strstr(buffer, "KEY: ");    
+    enc_dec->key = (uint8_t *)malloc(key_size);
+    enc_dec->iv = (uint8_t *)malloc(16);
+    memcpy(enc_dec->key, idx + 5, key_size);
+    if ((idx = strstr(buffer, "IV: ")) > 0)
+        memcpy(enc_dec->iv, idx + 4, 16);                                                                     
+    close(fd);
+
+    // fprintf(stdout, "command_proc:parse_plain_key_file:start\n");    
 }
 
 uint8_t *input_plain_key_text(int type, int key_size)
 {
-    fprintf(stdout, "command_proc:input_plain_key_IV_text:start\n");
+    // fprintf(stdout, "command_proc:input_plain_key_IV_text:start\n");
 
     uint8_t *ret;
     int ret_size;
@@ -117,18 +185,16 @@ uint8_t *input_plain_key_text(int type, int key_size)
         perror("command_proc:input_plain_key_text:malloc()");
         exit(1);
     }
-    while (getchar() != '\n')
-        ;
-
+    while (getchar() != '\n');
     fgets(ret, ret_size / 8 + 1, stdin);
 
-    fprintf(stdout, "command_proc:input_plain_key_IV_text:end\n");
+    // fprintf(stdout, "command_proc:input_plain_key_IV_text:end\n");
     return (ret);
 }
 
 int input_plain_key_file(int key_size, t_enc_dec *enc_dec)
 {
-    fprintf(stdout, "command_proc:input_plain_key_file:start\n");
+    // fprintf(stdout, "command_proc:input_plain_key_file:start\n");
 
     int fd;
     int read_bytes;
@@ -146,8 +212,7 @@ int input_plain_key_file(int key_size, t_enc_dec *enc_dec)
 
     fprintf(stdout, "input key file path\n> ");
 
-    while (getchar() != '\n')
-        ;
+    while (getchar() != '\n');
     fgets(file_name, BUFFER_SIZE, stdin);
     file_name[strcspn(file_name, "\n")] = '\0';
 
@@ -171,8 +236,129 @@ int input_plain_key_file(int key_size, t_enc_dec *enc_dec)
     }
 
     close(fd);
-    fprintf(stdout, "command_proc:input_plain_key_file:end\n");
+    // fprintf(stdout, "command_proc:input_plain_key_file:end\n");
     return (EXIT_SUCCESS);
+}
+
+void    decryption_menu_3(void)
+{
+    fprintf(stdout, "\n<Choose type for decryption target>\n");
+    fprintf(stdout, "1. plain text\n");
+    fprintf(stdout, "2. raw file\n");
+}
+
+void    decryption_menu2(void)
+{
+    fprintf(stdout, "\n<How would you enter a key?>\n");
+    fprintf(stdout, "1. plain key text\n");
+    fprintf(stdout, "2. key file\n");    
+}
+void    decryption_menu1(void)
+{
+    printf("\n<Choose decryption algorithm type>\n");
+    printf("1. AES128_CBC\t     2. AES128_CTR\n");
+    printf("3. AES256_CBC\t     4. AES256_CTR\n");
+}
+
+int command_decryption(t_operation *oper, key_t key)
+{
+    // printf("command_proc:command_decryption() start\n");
+
+    int choose;
+    int data_len = 0;
+    int key_size;
+
+    oper->operation_type = OPERATION_DECRYPT;
+    oper->operation_buf = (t_enc_dec *)malloc(sizeof(t_enc_dec));
+    t_enc_dec *enc_dec = oper->operation_buf;
+
+    decryption_menu1();
+    scanf("%d", &choose);
+    switch (choose)
+    {
+    case 1:
+        enc_dec->enc_dec_mode = MODE_CBC;
+    case 2:
+        enc_dec->enc_dec_isMAC = ISMAC_NONE;
+        enc_dec->enc_dec_algo = ALGO_AES128;
+        if (choose == 2)
+            enc_dec->enc_dec_mode = MODE_CTR;
+        key_size = 128;
+        data_len += (6 + sizeof(int)) * 3;        
+        break;
+    case 3:
+        enc_dec->enc_dec_mode = MODE_CBC;
+    case 4:
+        enc_dec->enc_dec_isMAC = ISMAC_NONE;
+        enc_dec->enc_dec_algo = ALGO_AES256;
+        if (choose == 4)
+            enc_dec->enc_dec_mode = MODE_CTR;
+        key_size = 256;
+        data_len += (6 + sizeof(int)) * 3;        
+        break;
+    default:
+        printf("Invalid input. please choose [help]\n");
+        exit(1);
+    }
+
+    decryption_menu2();
+    scanf("%d", &choose);
+    enc_dec->key_len = key_size / 8;
+    data_len += (6 + enc_dec->key_len);
+    data_len += (6 + 16);
+    switch (choose)
+    {
+    case 1:
+        enc_dec->key = input_plain_key_text(TYPE_KEY, key_size);
+        if (enc_dec->enc_dec_mode == MODE_NONE)
+            enc_dec->iv = NULL;
+        else
+            enc_dec->iv = input_plain_key_text(TYPE_IV, key_size);
+        break;
+    case 2:
+        parse_plain_key_file(key_size, enc_dec);
+        break;
+    default:
+        printf("Invalid input. please choose [help]\n");
+        exit(1);
+    }
+
+    decryption_menu_3();
+    scanf("%d", &choose);
+    data_len += 6;
+    switch (choose)
+    {
+    case 1:
+        enc_dec->input_data = input_enc_dec_target_text();
+        break;
+    case 2:
+        enc_dec->input_data = input_enc_dec_target_file();
+        break;
+    default:
+        printf("Invalid input. please choose [help]\n");
+        exit(1);
+    }
+    enc_dec->data_len = strlen(enc_dec->input_data);
+    data_len += enc_dec->data_len;
+
+    // printf("\ncommand_proc:command_decryption() start\n");
+    return (data_len);
+}
+
+void encryption_menu_1(void)
+{
+    fprintf(stdout, "\n<Choose encryption algorithm type>\n");
+    fprintf(stdout, "1. AES128_CBC\t     2. AES128_CTR\n");
+    fprintf(stdout, "3. AES256_CBC\t     4. AES256_CTR\n");
+    fprintf(stdout, "5. HMAC_SHA-256\t     6. HMAC_SHA3-256\n");
+    fprintf(stdout, "7. CMAC_AES128_CBC   8. CMAC_AES128_CTR\n>> ");
+}
+
+void encryption_menu_2(void)
+{
+    fprintf(stdout, "\n<How would you enter a key?>\n");
+    fprintf(stdout, "1. plain key text\n");
+    fprintf(stdout, "2. key file\n");
 }
 
 void encryption_menu_3(void)
@@ -182,61 +368,13 @@ void encryption_menu_3(void)
     fprintf(stdout, "2. raw file\n");
 }
 
-uint8_t *input_encryption_target_text(void)
-{
-    fprintf(stdout, "command_proc:input_encryption_target_text:start\n");
-
-    uint8_t buffer[BUFFER_SIZE];
-    uint8_t *ret = NULL;
-    int total_size = 0;
-    int size = 0;
-
-    fprintf(stdout, "type your plain text\n>> ");
-    while (1)
-    {
-        while (getchar() != '\n')
-            ;
-        fgets(buffer, BUFFER_SIZE, stdin);
-        size = strlen(buffer);
-        total_size += size;
-        if (ret == NULL)
-        {
-            ret = (uint8_t *)malloc(total_size + 1);
-            if (!ret)
-            {
-                perror("command_proc:input_encryption_target_text:malloc()");
-                exit(1);
-            }
-            memcpy(ret, buffer, total_size + 1);
-        }
-        else
-        {
-            ret = (uint8_t *)realloc(ret, total_size + 1);
-            if (!ret)
-            {
-                perror("command_proc:input_encryption_target_text:realloc()");
-                exit(1);
-            }
-            strncat(ret, buffer, size + 1);
-        }
-        if (buffer[size - 1] == '\n')
-        {
-            *(ret + total_size - 1) = 0;
-            break;
-        }
-    }
-
-    fprintf(stdout, "command_proc:input_encryption_target_text:end\n");
-    return (ret);
-}
-
 int command_encryption(t_operation *oper, key_t key)
 {
     int choose;
     int key_size;
     int data_len = 0;
 
-    printf("\ncommand_proc:command_encryption() start\n");
+    // printf("\ncommand_proc:command_encryption() start\n");
 
     oper->operation_type = OPERATION_ENCRYPT;
     oper->operation_buf = (t_enc_dec *)malloc(sizeof(t_enc_dec));
@@ -298,7 +436,6 @@ int command_encryption(t_operation *oper, key_t key)
     data_len += (6 + 16);
     switch (choose)
     {
-
     case 1:
         enc_dec->key = input_plain_key_text(TYPE_KEY, key_size);
         if (enc_dec->enc_dec_mode == MODE_NONE)
@@ -307,7 +444,7 @@ int command_encryption(t_operation *oper, key_t key)
             enc_dec->iv = input_plain_key_text(TYPE_IV, key_size);
         break;
     case 2:
-        // parse_plain_key_file(key_size, &enc_dec);
+        parse_plain_key_file(key_size, enc_dec);
         break;
     default:
         printf("Invalid input. please choose [help]\n");
@@ -320,10 +457,10 @@ int command_encryption(t_operation *oper, key_t key)
     switch (choose)
     {
     case 1:
-        enc_dec->input_data = input_encryption_target_text();
+        enc_dec->input_data = input_enc_dec_target_text();
         break;
     case 2:
-        // enc_dec->input_data = input_encryption_target_file();
+        enc_dec->input_data = input_enc_dec_target_file();
         break;
     default:
         printf("Invalid input. please choose [help]\n");
@@ -332,7 +469,7 @@ int command_encryption(t_operation *oper, key_t key)
     enc_dec->data_len = strlen(enc_dec->input_data);
     data_len += enc_dec->data_len;
 
-    printf("\ncommand_proc:command_encryption() start\n");
+    // printf("\ncommand_proc:command_encryption() start\n");
 
     return (data_len);
 }
@@ -348,7 +485,7 @@ void create_key_menu_1(void)
 
 int command_create_key(t_operation *oper, key_t key)
 {
-    printf("command_proc:command_create_key() start\n");
+    // printf("command_proc:command_create_key() start\n");
 
     int choose;
     int data_len = 0;
@@ -421,7 +558,7 @@ int command_proc(key_t key)
     uint8_t *payload;
     int payload_len;
 
-    printf("command_proc start\n");
+    // printf("command_proc start\n");
 
     choose_operation_menu();
     scanf("%d", &choose);
@@ -449,6 +586,6 @@ int command_proc(key_t key)
     payload = serialize(&oper, payload_len);
     mq_send(payload, payload_len, oper.operation_type, key);
 
-    printf("command_proc end\n");
+    // printf("command_proc end\n");
     return COMMAND_SUCCESS;
 }

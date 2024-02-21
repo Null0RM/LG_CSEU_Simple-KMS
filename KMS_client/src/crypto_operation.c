@@ -1,7 +1,6 @@
 #include "../inc/openssl_utils.h"
 
 int encrypt_operation(const EVP_CIPHER * algo_mode, uint8_t *plainText, uint8_t *cipherText, int plainText_len, uint8_t *key, uint8_t *iv) {
-    fprintf(stdout, "crypto_operation:encrypt_payload() start\n");
     
     int len = 0;
     int final_len = 0;
@@ -31,7 +30,6 @@ int encrypt_operation(const EVP_CIPHER * algo_mode, uint8_t *plainText, uint8_t 
     len += final_len;
     EVP_CIPHER_CTX_free(ctx);
     
-    fprintf(stdout, "crypto_operation:encrypt_payload() end\n");
     return len;
 }
 

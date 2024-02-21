@@ -1,5 +1,13 @@
 #include "../inc/operation.h"
 
+void    logging(int length, uint8_t * data, uint8_t * str)
+{
+    fprintf(stdout, "%s\n", str);
+    for(int i = 0; i < length; i++)
+        fprintf(stdout, "%02x ", data[i]);
+    fprintf(stdout, "\n");
+}
+
 t_keys get_session_key()
 {
     printf("mq_recv:get_session_key() start\n");
@@ -53,7 +61,7 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type, t_keys sessio
     }
     while (1)
     {
-        fprintf(stdout, "receiving messgae from client...\n");
+        fprintf(stdout, "receiving message from client...\n");
         if (-1 == (msgrcv(msqid, &recv_data, sizeof(t_data) - sizeof(long), 0, 0)))
         {
             perror("mq_recv:msgrcv()");
@@ -82,12 +90,14 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type, t_keys sessio
             }
             payload = newPayload; // 이렇게 해야 heap 영역 공간 부족 이슈를 해결할 수 있다.
         }
-        for(int i = 0; i < 32; i++)
-            printf("%02x ", recv_data.data_buf[i]);
-        printf("\n");
+        
+        logging(recv_data.data_len, recv_data.data_buf, "recvd data");
+
         tmp_length = decrypt_operation(EVP_aes_128_cbc(), tmp_data, recv_data.data_buf, recv_data.data_len, session_key.key, session_key.iv);
+        
+        logging(tmp_length, tmp_data, ">>decrypted message");
         memcpy(payload + prev_size, tmp_data, tmp_length);
-        prev_size += recv_data.data_len;
+        prev_size += tmp_length;
 
         if (recv_data.data_fin == 1)
         {
@@ -105,41 +115,25 @@ uint8_t *mq_recv_payload(key_t key, int *recv_len, int *oper_type, t_keys sessio
     return (payload);
 }
 
-void *mq_recv(key_t key, int *flag)
+void * mq_recv(key_t key, int *oper_type)
 {
     printf("mq_recv start\n");
 
-    int recv_len = 0;
     int oper_len = 0;
-    int oper_type = 0;
     t_keys session_key;
     uint8_t *payload;
     void *struct_oper;
 
     session_key = get_session_key();
-
-    for(int i = 0; i < 32; i++)
-        printf("%02x ", session_key.key[i]);
-    printf("\n");
-    for(int i = 0; i < 32; i++)
-        printf("%02x ", session_key.iv[i]);
-    printf("\n");
-
-    payload = mq_recv_payload(key, &recv_len, flag, session_key);
+    payload = mq_recv_payload(key, &oper_len, oper_type, session_key);
     if (!payload)
     {
         perror("mq_recv:mq_recv_payload()");
         exit(1);
     }
+    struct_oper = deserialize_tlv(payload, oper_len, *oper_type);
     
-    for(int i = 0; i < recv_len; i++)
-        fprintf(stdout, "%02x ", payload[i]);
-    fprintf(stdout, "\n");
-
-    struct_oper = deserialize_tlv(payload, oper_len, *flag);
     free(payload);
-
     printf("mq_recv end\n");
-
     return (struct_oper);
 }

@@ -19,6 +19,9 @@ typedef struct s_keys
 #define BUFFER_SIZE 1024
 #endif
 
+# ifndef OPERATION_FAILURE
+#  define OPERATION_FAILURE 0x00000099
+# endif
 /* ___FUNCTION_START___ */
 
 int encrypt_operation(const EVP_CIPHER *algo_mode, uint8_t *plainText, uint8_t *cipherText, int cipherText_len, uint8_t *key, uint8_t *iv);

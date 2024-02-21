@@ -13,6 +13,8 @@
 #  define COMMAND_SUCCESS 1
 #  define COMMAND_FAILURE 0
 
+#  define OPERATION_FAILURE 0x00000099
+
 #  ifndef BUFFER_SIZE
 #   define BUFFER_SIZE 1024
 #  endif
@@ -38,13 +40,13 @@
 #  define INPUTTYPE_FILE 0x00000001 // 임의지정
 #  define INPUTTYPE_TEXT 0x00000002 // 임의지정
 //types
-#  define TYPE_ISMAC 0x01
-#  define TYPE_ALGO 0x02
-#  define TYPE_MODE 0x03
-#  define TYPE_KEY 0x04
-#  define TYPE_IV 0x05
-#  define TYPE_INPUT_TYPE 0x06
-#  define TYPE_INPUT_DATA 0x07
+#  define TYPE_ISMAC 0x0001
+#  define TYPE_ALGO 0x0002
+#  define TYPE_MODE 0x0003
+#  define TYPE_KEY 0x0004
+#  define TYPE_IV 0x0005
+#  define TYPE_INPUT_TYPE 0x0006
+#  define TYPE_INPUT_DATA 0x0007
 /* __define_end__*/
 /* __typedef_start__*/
 
@@ -87,7 +89,7 @@ void storeLE32(uint8_t *buffer, uint32_t value);
 void storeLE16(uint8_t *buffer, uint16_t value);
 void    *mq_recv(key_t key, int *flag);
 void    *deserialize_tlv(uint8_t *oper, int oper_len, int oper_type);
-uint8_t *do_op(void *struct_oper, int flag, int *len);
+uint8_t *do_op(t_operation *struct_oper, int flag, int *len);
 t_keys  get_session_key(void);
 
 /* ___FUNCTION_DEFINE_END___ */

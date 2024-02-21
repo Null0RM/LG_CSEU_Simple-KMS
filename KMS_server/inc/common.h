@@ -9,4 +9,6 @@
 #  include <stdint.h>
 #  include <time.h>
 
+void    logging(int length, uint8_t * data, uint8_t * str);
+
 #endif

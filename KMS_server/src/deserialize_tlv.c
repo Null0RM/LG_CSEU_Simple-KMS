@@ -34,9 +34,89 @@ t_operation *deserialize_createKey(uint8_t *data, int   oper_len)
     t_operation *oper = malloc(sizeof(t_operation));
     oper->operation_buf = createKey;
     oper->operation_len = idx;
+    oper->operation_type = OPERATION_CREATEKEY;
 
     printf("deserialize:deserialize_createKey() end\n");
 
+    return oper;
+}
+
+t_operation *deserialize_enc_dec(uint8_t *data, int   oper_len, int oper_type)
+{
+    fprintf(stdout, "deserialize:deserialize_enc_dec() start\n");
+
+    t_enc_dec *enc_dec = malloc(sizeof(t_enc_dec));
+    int idx = 0;
+
+    while (idx < oper_len) {
+        uint16_t type = *(uint16_t *)(data + idx);
+        idx += 2;
+        uint32_t length = *(uint32_t *)(data + idx);
+        idx += 4;
+
+        printf("type: %hd\n", type);
+        switch (type) {
+            case TYPE_ISMAC:
+                enc_dec->enc_dec_isMAC = *(int *)(data + idx);
+                break;
+            case TYPE_ALGO:
+                enc_dec->enc_dec_algo = *(int *)(data + idx);
+                break;
+            case TYPE_MODE:
+                enc_dec->enc_dec_mode = *(int *)(data + idx);
+                break;
+            case TYPE_KEY:
+                if (enc_dec->enc_dec_algo == ALGO_AES128)
+                {
+                    enc_dec->key = (uint8_t *)malloc(17);
+                    memcpy(enc_dec->key, data + idx, 16);
+                    enc_dec->key[16] = '\0';
+                }    
+                else
+                {
+                    enc_dec->key = (uint8_t *)malloc(33);
+                    memcpy(enc_dec->key, data + idx, 32);
+                    enc_dec->key[32] = '\0';
+                }   
+                break;
+            case TYPE_IV:
+                if (enc_dec->enc_dec_isMAC == ISMAC_HMAC)
+                    enc_dec->iv = NULL;
+                else
+                {
+                    enc_dec->iv = (uint8_t *)malloc(17);
+                    memcpy(enc_dec->iv, data + idx, 16);
+                    enc_dec->iv[16] = '\0';
+                }      
+                break;
+            case TYPE_INPUT_DATA:
+                {
+                    enc_dec->data_len = oper_len - idx;
+                    printf("data_len : %d\n", enc_dec->data_len);
+                    enc_dec->input_data = (uint8_t *)malloc(enc_dec->data_len + 1);
+                    memcpy(enc_dec->input_data, data + idx, enc_dec->data_len);
+                    enc_dec->input_data[enc_dec->data_len] = '\0';
+                }
+                break;
+            default:
+                printf("Unknown type: %d\n", type);
+                break;
+        }
+
+        idx += length;
+    }
+
+    t_operation *oper = malloc(sizeof(t_operation));
+    oper->operation_buf = enc_dec;
+    oper->operation_len = idx;
+    oper->operation_type = oper_type;
+    
+    //logging
+    t_enc_dec *tmp = (t_enc_dec *)malloc(sizeof(t_enc_dec));
+    tmp = (t_enc_dec *)(oper->operation_buf);
+    logging(enc_dec->data_len, tmp->input_data, ">> operation_enc_dec: ");
+
+    fprintf(stdout, "deserialize:deserialize_enc_dec() end\n");
     return oper;
 }
 
@@ -46,79 +126,19 @@ void    *deserialize_tlv(uint8_t *oper, int oper_len, int oper_type)
     int     idx = 0;
     int     data_len;
     uint8_t type;
-    void    *struct_oper = NULL;
+    void * struct_oper = NULL;
 
     if (oper_type == OPERATION_CREATEKEY)
-    {
-        deserialize_createKey(oper, oper_len);
-    }
+        struct_oper = deserialize_createKey(oper, oper_len);
     else if (oper_type == OPERATION_ENCRYPT || oper_type == OPERATION_DECRYPT)
-    {
-        t_enc_dec *tmp = (t_enc_dec *)malloc(sizeof(t_enc_dec));
-        if (!tmp)
-        {
-            perror("deserialize_tlv:malloc()");
-            exit(1);
-        }
-        struct_oper = tmp;
-        
-        while (idx < oper_len)
-        {
-            type = oper[idx++];
-
-            switch(type)
-            {
-                case TYPE_ISMAC:
-                    data_len = oper[idx++];
-                    memcpy(&tmp->enc_dec_isMAC, oper + idx, data_len);
-                    idx += data_len;
-                    break;
-                case TYPE_ALGO:
-                    data_len = oper[idx++];
-                    memcpy(&tmp->enc_dec_algo, oper + idx, data_len);
-                    idx += data_len;
-                    break;                
-                case TYPE_MODE:
-                    data_len = oper[idx++];
-                    memcpy(&tmp->enc_dec_mode, oper + idx, data_len);
-                    idx += data_len;
-                    break;                
-                case TYPE_KEY:
-                    data_len = oper[idx++];
-                    tmp->key = (uint8_t *)malloc(data_len);
-                    memcpy(&tmp->key, oper + idx, data_len);
-                    idx += data_len;
-                    break;                
-                case TYPE_IV:
-                    data_len = oper[idx++];
-                    tmp->iv = (uint8_t *)malloc(data_len);
-                    memcpy(&tmp->iv, oper + idx, data_len);
-                    idx += data_len;
-                    break;                
-                case TYPE_INPUT_DATA:
-                    data_len = oper[idx];
-                    memcpy(&tmp->input_data, oper, sizeof(int));
-                    idx += sizeof(int);
-                    tmp->input_data = (uint8_t *)malloc(data_len);
-                    memcpy(&tmp->input_data, oper + idx, data_len);
-                    idx += data_len;
-                    break;                
-                default:
-                {
-                    fprintf(stderr, "Invalid Operation\n");
-                    exit(1);
-                }
-            }
-        }
-    }
+        struct_oper = deserialize_enc_dec(oper, oper_len, oper_type);
     else
     {
         fprintf(stdout, "Invalid oper_type\n");
         exit(1);
     }
-
+    
     fprintf(stdout, "deserialize end\n");
 
     return (struct_oper);
 }
-
